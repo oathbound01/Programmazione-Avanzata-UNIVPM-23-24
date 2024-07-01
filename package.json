@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "tic-tac-toe-ai-engine": "^1.0.9"
+  }
+}
