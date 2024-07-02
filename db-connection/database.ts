@@ -1,7 +1,7 @@
 import {Sequelize} from 'sequelize';
 
 /**
- *  The DBAccess class is a Signleton class responsible for connectiong to the database
+ *  The DBAccess class is a Singleton class responsible for connectiong to the database
  *  and ensuring that only one connection is made.
  *  
  */

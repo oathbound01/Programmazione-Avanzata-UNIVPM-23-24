@@ -6,8 +6,8 @@
 import { DBAccess } from '../db-connection/database';
 import { Request, Response } from 'express';
 import { Sequelize } from 'sequelize';
-import { User } as UserModel from '../model/User';
-import { Game } as UserModel from '../model/Game';
+import { GameTTT } from '../model/gameModel';
+import { User } from '../model/userModel';
 
 
 
@@ -41,7 +41,7 @@ export async function newGame(req: Request, res: Response): Promise<void> {
                          '', '', '', '', '', '', '', '',];
     } */
 
-        await GameModel.Game.create({
+        await GameTTT.create({
             gameMode: req.body.gameMode,
             startTime: new Date(),
             player1: req.body.playerOne,
@@ -53,10 +53,10 @@ export async function newGame(req: Request, res: Response): Promise<void> {
             winner: 'TBD',
         }).then((game: any) => {
 
-            UserModel.User.update({ inGame: true }, { where: { email: req.body.playerOne } });
+            User.update({ inGame: true }, { where: { email: req.body.playerOne } });
 
             if (req.body.gameOpponent != 'AI') {
-                UserModel.User.update({ inGame: true }, { where: { email: req.body.gameOpponent } });
+                User.update({ inGame: true }, { where: { email: req.body.gameOpponent } });
             }
 
             // TODO: find a way to implement a more complex message handler
@@ -82,7 +82,7 @@ export async function newGame(req: Request, res: Response): Promise<void> {
 export async function getGame(req: Request, res: Response): Promise<void> {
     try {
         const id = req.params.id;
-        await GameModel.Game.findOne({
+        await GameTTT.findOne({
             attributes: ['status', 'player1', 'player2', 'currentTurn', 'gameState', 'winner'],
             where: { gameId: id }
         }).then((game: any) => {
