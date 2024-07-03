@@ -1,9 +1,5 @@
 import {Message, Response, HttpStatusCode} from "./message";
 
-interface Message {
-    getResponse(): Response;
-}
-
 class CreateGameSuccess implements Message {
     getResponse(): Response {
         return {
