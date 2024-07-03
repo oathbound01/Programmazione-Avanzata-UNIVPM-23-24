@@ -41,7 +41,7 @@ async function checkIfUserExists(email: string): Promise<any> {
  * @param chargedata Body of the request containing admin and destination user details.
  * @returns Boolean indicating if the request is valid or a string error message.
  */
-export async function TokenChargeVal(chargedata: any): Promise<boolean | string> {
+export async function ValidateUserCharge(chargedata: any): Promise<boolean | string> {
     try {
         if (!chargedata.username_admin || chargedata.username_admin.role !== "admin") {
             return 'User is not authorized to perform this operation.';

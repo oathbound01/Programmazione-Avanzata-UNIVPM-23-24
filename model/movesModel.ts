@@ -12,7 +12,7 @@ export const Moves = sequelize.define('moves', {
             key: 'gameId',
         }},
         gameType: {type: DataTypes.STRING, allowNull: false},
-        turn: {type: DataTypes.DATE, allowNull: false},
+        moveDate: {type: DataTypes.DATE, allowNull: false},
     },
     {
         modelName: 'moves',
