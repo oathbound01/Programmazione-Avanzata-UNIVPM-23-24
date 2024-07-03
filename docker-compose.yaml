@@ -13,16 +13,16 @@ services:
       - .:/usr/app
   db:
     image: postgres:latest
-    restart: always
+    restart: unless-stopped
     environment:
-     - POSTGRES_DB=${DATABASE_NAME}
-     - POSTGRES_USER=${DATABASE_USER}
-     - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-     - PGPORT=${DATABASE_PORT}
+     - POSTGRES_DB=${DB_NAME}
+     - POSTGRES_USER=${DB_USER}
+     - POSTGRES_PASSWORD=${DB_PASSWORD}
+     - PGPORT=${DB_PORT}
     env_file:
       - .env
     ports:
-    - '${DATABASE_PORT}:${DATABASE_PORT}'
+    - '${DB_PORT}:${DB_PORT}'
     volumes:
     - pg_data:/var/lib/postgresql/data
 

@@ -6,9 +6,9 @@
 import { DBAccess } from '../db-connection/database';
 import { Request, Response } from 'express';
 import { Sequelize } from 'sequelize';
-import { GameTTT } from '../model/gameModel';
-import { User } from '../model/userModel';
-import { Moves } from '../model/movesModel';
+import { GameTTT } from '../models/gameModel';
+import { User } from '../models/userModel';
+import { Moves } from '../models/movesModel';
 import { hasWon, board2D } from './logic2D';
 import PDFDocument from 'pdfkit';
 
@@ -28,6 +28,8 @@ export async function newGame(req: Request, res: Response): Promise<void> {
     // default game state
 
     var gameState = board2D;
+
+    console.log(req.body);
 
     try {
         if (req.body.gameMode == '3D') {
@@ -61,6 +63,7 @@ export async function newGame(req: Request, res: Response): Promise<void> {
     } catch (error) {
         console.log(error);
         //  errorHandler(error, res);
+        res.status(500).send("ERROR LOL");
     }
 }
 
@@ -89,6 +92,7 @@ export async function getGame(req: Request, res: Response): Promise<void> {
     } catch (error) {
         console.log(error);
         // errorHandler(error, res);
+        res.status(500).send();
 
     }
 
@@ -154,6 +158,7 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
     } catch (error) {
         console.log(error);
         // errorHandler(error, res);
+        res.status(500).send();
     }
 }
 
@@ -187,6 +192,7 @@ export async function quitGame(req: Request, res: Response): Promise<void> {
     } catch (error) {
         console.log(error);
         // errorHandler(error, res);
+        res.status(500).send();
     }
 }
 
@@ -289,5 +295,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
     } catch (error) {
         console.log(error);
         // errorHandler(error, res);
+        res.status(500).send();
     }
 }
