@@ -1,6 +1,7 @@
 import {Sequelize, DataTypes, Op} from "sequelize";
 import {DBAccess} from "../db-connection/database";
 import {User} from "./userModel";
+import {CreateGameError} from "../messages/errorMessages";
 
 //Connection to DataBase
 const sequelize: Sequelize = DBAccess.getInstance()
@@ -34,7 +35,7 @@ export const GameTTT = sequelize.define('games', {
  * @param Player2 The second player's name or identifier. If 'AI', sets Player2 to null.
  * @throws Throws an error if there is an issue inserting the match into the database.
  */
-export async function insertNewMatch(Player1: string, Player2: string) {
+export async function insertNewGame(Player1: string, Player2: string | null = null) {
     try {
             await GameTTT.create({
                 Player1,
@@ -43,7 +44,6 @@ export async function insertNewMatch(Player1: string, Player2: string) {
                 status: "IN PROGRESS",
             });
     } catch (error) {
-        console.error('Error inserting new match:', error);
-        throw new Error('Error inserting new match');
+        return new CreateGameError().getResponse();
     }
 }

@@ -1,5 +1,6 @@
 import {DBAccess} from "../db-connection/database";
 import {DataTypes, Sequelize} from 'sequelize';
+import {TokenError, UserNotFound} from "../messages/errorMessages";
 
 //Connection to DataBase
 const sequelize: Sequelize = DBAccess.getInstance();
@@ -30,8 +31,7 @@ async function checkIfUserExists(email: string): Promise<any> {
 
         return result;
     } catch (error) {
-        console.error('Error during User search in the database.:', error);
-        throw new Error('Error during User search in the database.');
+        return  new UserNotFound().getResponse();
     }
 }
 
@@ -54,12 +54,21 @@ export async function ValidateUserCharge(chargedata: any): Promise<boolean | str
 
         const destinationUser = await checkIfUserExists(chargedata.destination_user);
         if (!destinationUser) {
-            return 'Destination user not found.';
+            throw new UserNotFound().getResponse();
         }
 
         return true;
     } catch (error) {
-        console.error('Error in TokenChargeVal function:', error);
-        throw new Error('Error in TokenChargeVal function');
+        throw new TokenError().getResponse();
     }
+}
+
+export async function getUserToken(userEmail: string) {
+    return await User.findOne({
+        raw: true,
+        attributes: ['token'],
+        where: {
+            email: userEmail
+        }
+    });
 }
