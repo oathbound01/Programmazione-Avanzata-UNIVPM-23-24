@@ -1,6 +1,6 @@
-import {Message, Response, HttpStatusCode} from "./message";
+import { Message, Response, HttpStatusCode } from "./message";
 
-class CreateGameSuccess implements Message {
+export class CreateGameSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.CREATED,
@@ -9,7 +9,7 @@ class CreateGameSuccess implements Message {
     }
 }
 
-class MoveSuccess implements Message {
+export class MoveSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
@@ -18,7 +18,7 @@ class MoveSuccess implements Message {
     }
 }
 
-class StatusGameSuccess implements Message {
+export class StatusGameSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
@@ -27,7 +27,7 @@ class StatusGameSuccess implements Message {
     }
 }
 
-class HistoryMovesSuccess implements Message {
+export class HistoryMovesSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
@@ -36,7 +36,7 @@ class HistoryMovesSuccess implements Message {
     }
 }
 
-class LeaderboardSuccess implements Message {
+export class LeaderboardSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
@@ -45,7 +45,7 @@ class LeaderboardSuccess implements Message {
     }
 }
 
-class GetTokenSuccess implements Message {
+export class GetTokenSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
@@ -54,7 +54,7 @@ class GetTokenSuccess implements Message {
     }
 }
 
-class ChargeTokenSuccess implements Message {
+export class ChargeTokenSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
@@ -63,7 +63,7 @@ class ChargeTokenSuccess implements Message {
     }
 }
 
-class EndGameSuccessClose implements Message {
+export class EndGameSuccessClose implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
@@ -72,7 +72,7 @@ class EndGameSuccessClose implements Message {
     }
 }
 
-class QuitGameSuccess implements Message {
+export class QuitGameSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
@@ -81,7 +81,7 @@ class QuitGameSuccess implements Message {
     }
 }
 
-class DefaultSuccess implements Message {
+export class DefaultSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,

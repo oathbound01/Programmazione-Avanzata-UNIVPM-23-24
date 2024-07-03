@@ -11,6 +11,8 @@ import { User } from '../models/userModel';
 import { Moves } from '../models/movesModel';
 import { hasWon, board2D } from './logic2D';
 import PDFDocument from 'pdfkit';
+import * as successHandler from '../messages/successMessage';
+import { HttpStatusCode } from '../messages/message';
 
 
 const connection: Sequelize = DBAccess.getInstance();
@@ -54,16 +56,13 @@ export async function newGame(req: Request, res: Response): Promise<void> {
                 User.update({ inGame: true }, { where: { email: req.body.gameOpponent } });
             }
 
-            // TODO: find a way to implement a more complex message handler
-
-            const response = { message: 'Game created successfully', status: 200 };
+            const success = new successHandler.CreateGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
-            res.status(response.status).json({ Message: response.message, ID: game.id });
+            res.status(success.status).json({ Message: success.message, ID: game.id });
         });
     } catch (error) {
         console.log(error);
-        //  errorHandler(error, res);
-        res.status(500).send("ERROR LOL");
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
 }
 
@@ -85,15 +84,14 @@ export async function getGame(req: Request, res: Response): Promise<void> {
 
             // TODO: find a way to implement a more complex message handler
 
-            const response = { message: 'Game status retrieved successfully', status: 200 };
+            const success = new successHandler.StatusGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
-            res.status(response.status).json({ Message: response.message, GameStatus: game });
+            let gameOutput = game.map((param: any) => param.toJSON());
+            res.status(success.status).json({ Message: success.message, GameStatus: gameOutput });
         });
     } catch (error) {
         console.log(error);
-        // errorHandler(error, res);
-        res.status(500).send();
-
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
 
 }
@@ -150,15 +148,14 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
                 winner: newWinner,
                 status: newStatus
             }, { where: { gameId: id } }).then(() => {
-                const response = { message: 'Move made successfully', status: 200 };
+                const success = new successHandler.MoveSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
-                res.status(response.status).json({ Message: response.message });
+                res.status(success.status).json({ Message: success.message, gameState: newGameState });
             });
         });
     } catch (error) {
         console.log(error);
-        // errorHandler(error, res);
-        res.status(500).send();
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
 }
 
@@ -182,17 +179,16 @@ export async function quitGame(req: Request, res: Response): Promise<void> {
                 status: newStatus,
                 winner: newWinner
             }, { where: { gameId: req.params.id } }).then(() => {
-                const response = { message: 'You quit the game', status: 200 };
+                const success = new successHandler.QuitGameSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
-                res.status(response.status).json({ Message: response.message });
+                res.status(success.status).json({ Message: success.message });
             });
         });
 
 
     } catch (error) {
         console.log(error);
-        // errorHandler(error, res);
-        res.status(500).send();
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
 }
 
@@ -200,10 +196,10 @@ export async function quitGame(req: Request, res: Response): Promise<void> {
  * 
  *  Function that saves the move made by a player.
  * 
- * @param gameId 
- * @param gameType 
- * @param player 
- * @param move 
+ * @param gameId The id of the game
+ * @param gameType The game type (2D or 3D)
+ * @param player The player that made the move
+ * @param move The move made by the player (saved as an array of integers)
  */
 
 async function saveMove(gameId: number, gameType: string, player: string, move: Array<number>): Promise<void> {
@@ -217,7 +213,6 @@ async function saveMove(gameId: number, gameType: string, player: string, move: 
         });
     } catch (error) {
         console.log(error);
-        // errorHandler(error, res);
     }
 }
 /**
@@ -270,7 +265,7 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
             where: filters,
         }).then((moves: any) => {
 
-            let output = moves.map((move:any) => move.toJSON());
+            let output = moves.map((move: any) => move.toJSON());
 
             if (req.body.fileType == 'PDF') {
                 res.header('Content-Type', 'application/pdf');
@@ -286,15 +281,14 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
                 res.status(200).send();
 
             } else {
-                const response = { message: 'Move history retrieved successfully', status: 200 };
+                const success = new successHandler.HistoryMovesSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
-                res.status(response.status).json({ Message: response.message, MoveHistory: output });
+                res.status(success.status).json({ Message: success.message, MoveHistory: output });
             };
         });
 
     } catch (error) {
         console.log(error);
-        // errorHandler(error, res);
-        res.status(500).send();
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
 }

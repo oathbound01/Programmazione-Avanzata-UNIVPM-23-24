@@ -6,15 +6,15 @@
  */
 
 export const board2D:Array<string>  = [ '', '', '',
-                                    '', '', '',
-                                    '', '', ''];
+                                        '', '', '',
+                                        '', '', ''];
 
 /**
  * 
  * This function checks if the game has ended in a victory.
  * 
- * @param gameState 
- * @returns 
+ * @param gameState The current game state
+ * @returns true if the game has been won, false otherwise.
  */
 
 
