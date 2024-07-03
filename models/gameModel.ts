@@ -20,7 +20,7 @@ export const GameTTT = sequelize.define('games', {
         currentTurn: {type: DataTypes.STRING, allowNull: false},
         gameMode: {type: DataTypes.STRING, allowNull: false},
         status: {type: DataTypes.STRING, allowNull: false},
-        gameState: {type: DataTypes.STRING, allowNull: false},
+        gameState: {type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false},
         winner: {type: DataTypes.STRING, defaultValue: "The game is not finished"},
     },
     {
@@ -34,23 +34,14 @@ export const GameTTT = sequelize.define('games', {
  * @param Player2 The second player's name or identifier. If 'AI', sets Player2 to null.
  * @throws Throws an error if there is an issue inserting the match into the database.
  */
-export async function insertNewMatch(Player1: string, Player2: string | null = null) {
+export async function insertNewMatch(Player1: string, Player2: string) {
     try {
-        if (Player2 === "AI") {
-            // Se il match è contro l'IA, imposta player2 a null
-            await GameTTT.create({
-                Player1,
-                start_date: sequelize.fn('NOW'),
-                status: "open",
-            });
-        } else {
             await GameTTT.create({
                 Player1,
                 Player2,
                 start_date: sequelize.fn('NOW'),
-                status: "open",
+                status: "IN PROGRESS",
             });
-        }
     } catch (error) {
         console.error('Error inserting new match:', error);
         throw new Error('Error inserting new match');
