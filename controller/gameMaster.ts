@@ -85,6 +85,13 @@ export async function getGame(req: Request, res: Response): Promise<void> {
             where: { gameId: id }
         }).then((game: any) => {
 
+            // Set player inGame status to true
+
+            updatePlayerInGameStatus(game.player1, true);
+            if (game.player2 != 'AI') {
+                updatePlayerInGameStatus(game.player2, true);
+            }
+
             const success = new successHandler.StatusGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
             let gameOutput = game.toJSON();
@@ -95,6 +102,21 @@ export async function getGame(req: Request, res: Response): Promise<void> {
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
 
+}
+
+/**
+ *  This function sets the inGame status of a player.
+ * 
+ * @param player the player to update
+ * @param status "true" or "false", depending on the desired status.
+ */
+
+export async function updatePlayerInGameStatus(player: any, status: boolean): Promise<void> {
+    try {
+        await User.update({ inGame: status }, { where: { email: player } });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 /**
@@ -175,11 +197,16 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
                 }
             }
 
+            // Turn checks and inGame checks
 
             if (newStatus != 'FINISHED') {
                 var newTurn = game.currentTurn == game.player1 ? game.player2 : game.player1;
             } else {
                 var newTurn = game.currentTurn;
+                updatePlayerInGameStatus(game.player1, false);
+                if (game.player2 != 'AI') {
+                    updatePlayerInGameStatus(game.player2, false);
+                }
             }
             GameTTT.update({
                 gameState: newGameState,
@@ -330,4 +357,100 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
         console.log(error);
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
+}
+
+/**
+ * 
+ *  This function calculates the leaderboard based on the number of wins and losses.
+ * 
+ * @param req 
+ * @param res 
+ */
+
+export async function getLeaderboard(req: Request, res: Response): Promise<void> {
+
+    try {
+
+        const { Op } = require('sequelize');
+
+        async function getWins(userId: string) {
+            const wins = await GameTTT.count({
+                where: {
+                    winner: userId
+                }
+            });
+            return wins;
+        }
+
+        async function getLosses(userId: string) {
+            const losses = await GameTTT.count({
+                where: {
+                    [Op.or]: [
+                        { player1: userId },
+                        { player2: userId }
+                    ],
+                    winner: {
+                        [Op.not]: userId
+                    }
+                }
+            });
+            return losses;
+        }
+
+        async function getForfeitWins(userId: string) {
+            const forfeitWins = await GameTTT.count({
+                where: {
+                    winner: userId,
+                    status: 'FORFEIT'
+                }
+            });
+            return forfeitWins;
+        }
+
+        async function getForfeitLosses(userId: string) {
+            const forfeitLosses = await GameTTT.count({
+                where: {
+                    [Op.or]: [
+                        { player1: userId },
+                        { player2: userId }
+                    ],
+                    winner: {
+                        [Op.not]: userId
+                    },
+                    status: 'FORFEIT'
+                }
+            });
+            return forfeitLosses;
+        }
+
+        // Calculate the leaderboard for all users
+
+        const users: any = await User.findAll();
+
+        var lb: any = {};
+
+        for (let user of users) {
+
+            const wins = await getWins(user.email);
+            const losses = await getLosses(user.email);
+            const forfeitWins = await getForfeitWins(user.email);
+            const forfeitLosses = await getForfeitLosses(user.email);
+            lb[user.email] = {
+                wins: wins,
+                losses: losses,
+                forfeitWins: forfeitWins,
+                forfeitLosses: forfeitLosses
+            };
+
+        }
+
+        res.header('Content-Type', 'application/json');
+        res.status(HttpStatusCode.OK).json({ Message: successHandler.LeaderboardSuccess, Leaderboard: lb });
+
+    } catch (error) {
+        console.log(error);
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
+    }
+
+
 }

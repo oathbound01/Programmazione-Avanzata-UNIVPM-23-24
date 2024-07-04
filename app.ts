@@ -28,6 +28,10 @@ app.post('/quitGame', (req: Request, res: Response) => {
     gameMaster.quitGame(req, res)
     });
 
+app.get('/leaderboard', (req: Request, res: Response) => {
+    gameMaster.getLeaderboard(req, res)
+});  
+
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
