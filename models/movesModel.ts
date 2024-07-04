@@ -8,7 +8,7 @@ const sequelize: Sequelize = DBAccess.getInstance()
 
 export const Moves = sequelize.define('moves', {
         moveId: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-        gameId: {type: DataTypes.STRING, allowNull: false, references: {
+        gameId: {type: DataTypes.INTEGER, allowNull: false, references: {
             model: GameTTT,
             key: 'gameId',
         }},

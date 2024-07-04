@@ -5,7 +5,7 @@ COPY . .
 # Dependencies
 
 RUN npm install
-RUN npm install -g typescript ts-node nodemon sequelize-cli sequelize-auto-migrations
+RUN npm install -g typescript ts-node nodemon sequelize-cli
 
 # App run
 

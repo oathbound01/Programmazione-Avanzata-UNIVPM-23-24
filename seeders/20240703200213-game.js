@@ -5,28 +5,28 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('games', [
       {
-        player1: 'player1@example.com',
-        player2: 'player2@example.com',
+        player1: 'user1@example.com',
+        player2: 'user2@example.com',
         startTime: new Date(),
         turnTime: new Date(),
-        currentTurn: 'player1',
-        gameMode: 'multiplayer',
-        status: 'in progress',
+        currentTurn: 'user1@example.com',
+        gameMode: '3D',
+        status: 'IN PROGRESS',
         gameState: ['position1', 'position2', 'position3'],
-        winner: 'The game is not finished',
+        winner: 'TBD',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        player1: 'player3@example.com',
-        player2: 'player4@example.com',
+        player1: 'user1@example.com',
+        player2: 'AI',
         startTime: new Date(),
         turnTime: new Date(),
-        currentTurn: 'player3',
-        gameMode: 'multiplayer',
-        status: 'finished',
+        currentTurn: 'user1@example.com',
+        gameMode: '2D',
+        status: 'FINISHED',
         gameState: ['position1', 'position2', 'position3'],
-        winner: 'player3@example.com',
+        winner: 'user1@example.com',
         createdAt: new Date(),
         updatedAt: new Date()
       }

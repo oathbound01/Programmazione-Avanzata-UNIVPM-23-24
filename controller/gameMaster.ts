@@ -58,7 +58,7 @@ export async function newGame(req: Request, res: Response): Promise<void> {
 
             const success = new successHandler.CreateGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
-            res.status(success.status).json({ Message: success.message, ID: game.id });
+            res.status(success.status).json({ Message: success.message, ID: game.gameId });
         });
     } catch (error) {
         console.log(error);
@@ -76,17 +76,15 @@ export async function newGame(req: Request, res: Response): Promise<void> {
 
 export async function getGame(req: Request, res: Response): Promise<void> {
     try {
-        const id = req.params.id;
+        const id = req.body.id;
         await GameTTT.findOne({
             attributes: ['status', 'player1', 'player2', 'currentTurn', 'gameState', 'winner'],
             where: { gameId: id }
         }).then((game: any) => {
 
-            // TODO: find a way to implement a more complex message handler
-
             const success = new successHandler.StatusGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
-            let gameOutput = game.map((param: any) => param.toJSON());
+            let gameOutput = game.toJSON();
             res.status(success.status).json({ Message: success.message, GameStatus: gameOutput });
         });
     } catch (error) {
@@ -107,11 +105,11 @@ export async function getGame(req: Request, res: Response): Promise<void> {
 
 export async function makeMove(req: Request, res: Response): Promise<void> {
     try {
-        const id = req.params.id;
+        const id = req.body.id;
         const move = req.body.move;
 
         await GameTTT.findOne({
-            attributes: ['gameState', 'currentTurn', 'player1', 'player2', 'winner', 'gameMode', 'turnTime'],
+            attributes: ['gameState', 'currentTurn', 'player1', 'player2', 'winner', 'gameMode', 'turnTime', 'gameId'],
             where: { gameId: id }
         }).then((game: any) => {
 
@@ -125,23 +123,32 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
                 newGameState[move] = 'O';
             }
 
-            saveMove(game.id, game.gameMode, req.body.player, move);
+            let moveArray:Array<number> = [move]
+
+            saveMove(game.gameId, game.gameMode, req.body.player, moveArray);
 
             if (hasWon(newGameState)) {
                 var newWinner: string = req.body.player;
                 var newStatus = 'FINISHED';
-            } else {
+            } else if (!hasWon(newGameState) && !(newGameState.indexOf('') == -1)) {
                 if (game.player2 == 'AI') {
                     var engineAI = require('tic-tac-toe-ai-engine');
                     var newGameState = engineAI.computeMove(newGameState).nextBestGameState;
                     if (hasWon(newGameState)) {
-                        var newWinner: string = 'AI';
+                        var newWinner = 'AI';
                         var newStatus = 'FINISHED';
                     }
                 }
+            } else if (!hasWon(newGameState) && newGameState.indexOf('') == -1) {
+                var newStatus = 'FINISHED';
+                var newWinner = 'DRAW';
+            } 
+            
+            if (newStatus != 'FINISHED') {
+                var newTurn = game.currentTurn == game.player1 ? game.player2 : game.player1;
+            } else {
+                var newTurn = game.currentTurn;
             }
-
-            let newTurn = game.currentTurn == game.player1 ? game.player2 : game.player1;
             GameTTT.update({
                 gameState: newGameState,
                 currentTurn: newTurn,
@@ -171,14 +178,14 @@ export async function quitGame(req: Request, res: Response): Promise<void> {
     try {
         await GameTTT.findOne({
             attributes: ['player1', 'player2', 'status', 'currentTurn'],
-            where: { gameId: req.params.id }
+            where: { gameId: req.body.id }
         }).then((game: any) => {
             var newStatus = 'FORFEIT';
             var newWinner = game.currentTurn == game.player1 ? game.player2 : game.player1;
             GameTTT.update({
                 status: newStatus,
                 winner: newWinner
-            }, { where: { gameId: req.params.id } }).then(() => {
+            }, { where: { gameId: req.body.id } }).then(() => {
                 const success = new successHandler.QuitGameSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
                 res.status(success.status).json({ Message: success.message });
@@ -210,6 +217,8 @@ async function saveMove(gameId: number, gameType: string, player: string, move: 
             player: player,
             move: move,
             moveDate: new Date()
+        }).then((move:any) => { 
+            console.log('Move saved:' + move.moveId);
         });
     } catch (error) {
         console.log(error);
@@ -277,8 +286,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
                 doc.text(JSON.stringify(output, null, 2));
 
                 doc.end();
-
-                res.status(200).send();
 
             } else {
                 const success = new successHandler.HistoryMovesSuccess().getResponse();
