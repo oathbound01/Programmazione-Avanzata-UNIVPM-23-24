@@ -10,6 +10,7 @@ import { GameTTT } from '../models/gameModel';
 import { User } from '../models/userModel';
 import { Moves } from '../models/movesModel';
 import { hasWon, board2D } from './logic2D';
+import { hasWon3D, board3D, hasEmptyCells3D } from './logic3D';
 import PDFDocument from 'pdfkit';
 import * as successHandler from '../messages/successMessage';
 import { HttpStatusCode } from '../messages/message';
@@ -27,15 +28,17 @@ const connection: Sequelize = DBAccess.getInstance();
 
 export async function newGame(req: Request, res: Response): Promise<void> {
 
-    // default game state
+    // gameState may vary depending on the game mode.
 
-    var gameState = board2D;
+    var gameState: string[] | string[][];
 
     console.log(req.body);
 
     try {
         if (req.body.gameMode == '3D') {
-            //var gameState = board3D;
+            gameState = board3D;
+        } else {
+            gameState = board2D;
         }
 
         await GameTTT.create({
@@ -116,34 +119,63 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
             var newWinner: string = 'TBD';
             var newStatus = 'IN PROGRESS';
 
-            var newGameState = game.gameState;
-            if (req.body.player === game.player1) {
-                newGameState[move] = 'X';
-            } else if (req.body.player === game.player2) {
-                newGameState[move] = 'O';
-            }
+            if (game.gameMode == '3D') {
+                var newGameState = game.gameState;
+                if (req.body.player === game.player1) {
+                    newGameState[move[0]][move[1]] = 'X';
+                } else if (req.body.player === game.player2) {
+                    newGameState[move[0]][move[1]] = 'O';
+                }
 
-            let moveArray:Array<number> = [move]
+            } else {
+                var newGameState = game.gameState;
+                if (req.body.player === game.player1) {
+                    newGameState[move] = 'X';
+                } else if (req.body.player === game.player2) {
+                    newGameState[move] = 'O';
+                }
+            }
+            // Necessary formatting to save the move
+
+            if (typeof move === 'number') {
+                var moveArray: number[] = [move]
+            } else {
+                var moveArray: number[] = move;
+            }
 
             saveMove(game.gameId, game.gameMode, req.body.player, moveArray);
 
-            if (hasWon(newGameState)) {
-                var newWinner: string = req.body.player;
-                var newStatus = 'FINISHED';
-            } else if (!hasWon(newGameState) && !(newGameState.indexOf('') == -1)) {
-                if (game.player2 == 'AI') {
-                    var engineAI = require('tic-tac-toe-ai-engine');
-                    var newGameState = engineAI.computeMove(newGameState).nextBestGameState;
-                    if (hasWon(newGameState)) {
-                        var newWinner = 'AI';
-                        var newStatus = 'FINISHED';
-                    }
+            // Victory check, draw check and AI move
+
+            if (game.gameMode == '3D') {
+                if (hasWon3D(newGameState)) {
+                    var newWinner: string = req.body.player;
+                    var newStatus = 'FINISHED';
+                } else if (!hasWon3D(newGameState) && !hasEmptyCells3D(newGameState)) {
+                    console.log('lol wtf?!')
+                    var newStatus = 'FINISHED';
+                    var newWinner = 'DRAW';
                 }
-            } else if (!hasWon(newGameState) && newGameState.indexOf('') == -1) {
-                var newStatus = 'FINISHED';
-                var newWinner = 'DRAW';
-            } 
-            
+            } else {
+                if (hasWon(newGameState)) {
+                    var newWinner: string = req.body.player;
+                    var newStatus = 'FINISHED';
+                } else if (!hasWon(newGameState) && !(newGameState.indexOf('') == -1)) {
+                    if (game.player2 == 'AI') {
+                        var engineAI = require('tic-tac-toe-ai-engine');
+                        var newGameState = engineAI.computeMove(newGameState).nextBestGameState;
+                        if (hasWon(newGameState)) {
+                            var newWinner = 'AI';
+                            var newStatus = 'FINISHED';
+                        }
+                    }
+                } else if (!hasWon(newGameState) && newGameState.indexOf('') == -1) {
+                    var newStatus = 'FINISHED';
+                    var newWinner = 'DRAW';
+                }
+            }
+
+
             if (newStatus != 'FINISHED') {
                 var newTurn = game.currentTurn == game.player1 ? game.player2 : game.player1;
             } else {
@@ -217,7 +249,7 @@ async function saveMove(gameId: number, gameType: string, player: string, move: 
             player: player,
             move: move,
             moveDate: new Date()
-        }).then((move:any) => { 
+        }).then((move: any) => {
             console.log('Move saved:' + move.moveId);
         });
     } catch (error) {

@@ -1,15 +1,8 @@
 import express, {Application, Request, Response} from 'express';
 import * as gameMaster from './controller/gameMaster';
-import {Sequelize}from 'sequelize';
-import {DBAccess} from './db-connection/database';
-
-// const connection: Sequelize = DBAccess.getInstance();
 
 const app : Application = express();
 app.use(express.json());
-
-//connection.sync({ force: true });
-//console.log('All models were synchronized successfully.');
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!');

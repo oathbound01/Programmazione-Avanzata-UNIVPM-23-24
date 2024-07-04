@@ -5,7 +5,7 @@
  * 
  */
 
-export const board2D:Array<string>  = [ '', '', '',
+export const board2D:string[]  = [ '', '', '',
                                         '', '', '',
                                         '', '', ''];
 
@@ -18,7 +18,7 @@ export const board2D:Array<string>  = [ '', '', '',
  */
 
 
-export function hasWon(gameState:Array<string>): boolean {
+export function hasWon(gameState:string[]): boolean {
     // Row check
     for (let i = 0; i < 9; i += 3) {
         if (gameState[i] !== '' && gameState[i] === gameState[i + 1] && gameState[i] === gameState[i + 2]) {
