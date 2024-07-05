@@ -12,9 +12,8 @@ const sequelize: Sequelize = DBAccess.getInstance();
  */
 export const User = sequelize.define('users', {
     email: {type: DataTypes.STRING,  primaryKey: true, unique: true},
-    password: {type: DataTypes.STRING},
     role: {type: DataTypes.STRING},
-    token: {type: DataTypes.REAL},
+    credits: {type: DataTypes.DECIMAL(5, 2)},
     inGame: {type: DataTypes.BOOLEAN}
 },
 {

@@ -15,9 +15,16 @@ import PDFDocument from 'pdfkit';
 import * as csv from 'csv-stringify/sync';
 import * as successHandler from '../messages/successMessage';
 import { HttpStatusCode } from '../messages/message';
+import { chargeUser } from './creditManagement';
 
 
 const connection: Sequelize = DBAccess.getInstance();
+
+// Credit costs
+
+const AI_GAME_COST = 0.75;
+const PVP_GAME_COST = 0.45;
+const MOVE_COST = 0.05;
 
 /**
  * 
@@ -58,6 +65,9 @@ export async function newGame(req: Request, res: Response): Promise<void> {
 
             if (req.body.gameOpponent != 'AI') {
                 updatePlayerInGameStatus(req.body.gameOpponent, true);
+                chargeUser(PVP_GAME_COST, req.body.playerOne);
+            } else {
+                chargeUser(AI_GAME_COST, req.body.playerOne);
             }
 
             const success = new successHandler.CreateGameSuccess().getResponse();
@@ -215,6 +225,10 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
                 winner: newWinner,
                 status: newStatus
             }, { where: { gameId: id } }).then(() => {
+
+                // Charge the player for the move
+                chargeUser(MOVE_COST, req.body.player);
+
                 const success = new successHandler.MoveSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
                 res.status(success.status).json({ Message: success.message, gameState: newGameState });
