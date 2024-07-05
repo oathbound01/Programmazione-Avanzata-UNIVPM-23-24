@@ -10,17 +10,13 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
       role: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      token: {
+      credits: {
         allowNull: false,
-        type: Sequelize.REAL
+        type: Sequelize.DECIMAL(5,2)
       },
       inGame: {
         allowNull: false,

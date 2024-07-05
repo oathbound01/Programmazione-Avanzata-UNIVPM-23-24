@@ -6,16 +6,14 @@ module.exports = {
     await queryInterface.bulkInsert('users', [
       {
         email: 'user1@example.com',
-        password: 'password1',
         role: 'admin',
-        token: 123456789,
+        token: 20.00,
         inGame: true
       },
       {
         email: 'user2@example.com',
-        password: 'password2',
         role: 'user',
-        token: 987654321,
+        token: 5.00,
         inGame: false
       }
     ], {});
