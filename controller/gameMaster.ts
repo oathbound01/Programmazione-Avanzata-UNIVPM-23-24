@@ -12,6 +12,7 @@ import { Moves } from '../models/movesModel';
 import { hasWon, board2D } from './logic2D';
 import { hasWon3D, board3D, hasEmptyCells3D } from './logic3D';
 import PDFDocument from 'pdfkit';
+import * as csv from 'csv-stringify/sync';
 import * as successHandler from '../messages/successMessage';
 import { HttpStatusCode } from '../messages/message';
 
@@ -53,10 +54,10 @@ export async function newGame(req: Request, res: Response): Promise<void> {
             winner: 'TBD',
         }).then((game: any) => {
 
-            User.update({ inGame: true }, { where: { email: req.body.playerOne } });
+            updatePlayerInGameStatus(req.body.playerOne, true);
 
             if (req.body.gameOpponent != 'AI') {
-                User.update({ inGame: true }, { where: { email: req.body.gameOpponent } });
+                updatePlayerInGameStatus(req.body.gameOpponent, true);
             }
 
             const success = new successHandler.CreateGameSuccess().getResponse();
@@ -333,20 +334,18 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
             where: filters,
         }).then((moves: any) => {
 
+            // Output manipulation. Defaults to JSON.
+
             let output = moves.map((move: any) => move.toJSON());
 
-            if (req.body.fileType == 'PDF') {
+            if (req.body.fileType === 'PDF' || req.body.fileType === 'pdf') {
                 res.header('Content-Type', 'application/pdf');
-
                 let doc = new PDFDocument();
-
                 doc.pipe(res);
-
                 doc.text(JSON.stringify(output, null, 2));
-
                 doc.end();
 
-            } else {
+            } else if (req.body.fileType === 'JSON' || req.body.fileType === 'json' || !req.body.fileType) {
                 const success = new successHandler.HistoryMovesSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
                 res.status(success.status).json({ Message: success.message, MoveHistory: output });
@@ -427,7 +426,7 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
 
         const users: any = await User.findAll();
 
-        var lb: any = {};
+        var lb: any | object = {};
 
         for (let user of users) {
 
@@ -444,8 +443,51 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
 
         }
 
-        res.header('Content-Type', 'application/json');
-        res.status(HttpStatusCode.OK).json({ Message: successHandler.LeaderboardSuccess, Leaderboard: lb });
+        // Filters
+
+        if (req.body.filter === 'ascending') {
+            lb = Object.fromEntries(Object.entries(lb).sort(
+                (a: any, b: any) => a[1].wins - b[1].wins));
+        } else if (req.body.filter === 'descending') {
+            lb = Object.fromEntries(Object.entries(lb).sort(
+                (a: any, b: any) => b[1].wins - a[1].wins));
+        }
+
+        // Output manipulation. Defaults to JSON.
+
+        if (req.body.fileType === 'pdf' || req.body.fileType === 'PDF') {
+            res.header('Content-Type', 'application/pdf');
+
+            let doc = new PDFDocument();
+            doc.pipe(res);
+            doc.text(JSON.stringify(lb, null, 2));
+            doc.end();
+
+        } else if (req.body.fileType === 'CSV' || req.body.fileType === 'csv') {
+
+            // This function is the hackiest thing I've ever wrote, I hate csv.
+
+            let headers: string[] = ['User', 'Wins', 'Losses', 'Forfeit Wins', 'Forfeit Losses'];
+            let values: any[] = Object.values(Object.values(lb));
+            let emails = Object.keys(lb);
+            let data: any[][] = [];
+            data.push(headers);
+
+            for (let i = 0; i < values.length; i++) {
+                let row = Object.values(values[i]);
+                row.unshift(emails[i]);
+                data.push(row);
+            }
+
+            let output = csv.stringify(data);
+            res.header('Content-Type', 'text/csv');
+            res.status(HttpStatusCode.OK).send(output);
+
+        } else if (req.body.fileType === 'JSON' || req.body.fileType === 'json' || !req.body.fileType) {
+            res.header('Content-Type', 'application/json');
+            const success = new successHandler.LeaderboardSuccess().getResponse();
+            res.status(success.status).json({ Message: success.message, Leaderboard: lb });
+        }
 
     } catch (error) {
         console.log(error);

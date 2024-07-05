@@ -5,7 +5,8 @@
     "pdfkit": "^0.15.0",
     "pg": "^8.7.3",
     "sequelize": "^6.37.3",
-    "tic-tac-toe-ai-engine": "^1.0.9"
+    "tic-tac-toe-ai-engine": "^1.0.9",
+    "csv": "^6.3.9"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
