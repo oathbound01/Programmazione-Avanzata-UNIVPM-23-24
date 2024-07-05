@@ -10,6 +10,7 @@ import { GameTTT } from '../models/gameModel';
 import { User } from '../models/userModel';
 import { Moves } from '../models/movesModel';
 import { hasWon, board2D } from './logic2D';
+import { hasWon3D, board3D, hasEmptyCells3D } from './logic3D';
 import PDFDocument from 'pdfkit';
 import * as successHandler from '../messages/successMessage';
 import { HttpStatusCode } from '../messages/message';
@@ -27,15 +28,17 @@ const connection: Sequelize = DBAccess.getInstance();
 
 export async function newGame(req: Request, res: Response): Promise<void> {
 
-    // default game state
+    // gameState may vary depending on the game mode.
 
-    var gameState = board2D;
+    var gameState: string[] | string[][];
 
     console.log(req.body);
 
     try {
         if (req.body.gameMode == '3D') {
-            //var gameState = board3D;
+            gameState = board3D;
+        } else {
+            gameState = board2D;
         }
 
         await GameTTT.create({
@@ -58,7 +61,7 @@ export async function newGame(req: Request, res: Response): Promise<void> {
 
             const success = new successHandler.CreateGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
-            res.status(success.status).json({ Message: success.message, ID: game.id });
+            res.status(success.status).json({ Message: success.message, ID: game.gameId });
         });
     } catch (error) {
         console.log(error);
@@ -76,17 +79,22 @@ export async function newGame(req: Request, res: Response): Promise<void> {
 
 export async function getGame(req: Request, res: Response): Promise<void> {
     try {
-        const id = req.params.id;
+        const id = req.body.id;
         await GameTTT.findOne({
             attributes: ['status', 'player1', 'player2', 'currentTurn', 'gameState', 'winner'],
             where: { gameId: id }
         }).then((game: any) => {
 
-            // TODO: find a way to implement a more complex message handler
+            // Set player inGame status to true
+
+            updatePlayerInGameStatus(game.player1, true);
+            if (game.player2 != 'AI') {
+                updatePlayerInGameStatus(game.player2, true);
+            }
 
             const success = new successHandler.StatusGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
-            let gameOutput = game.map((param: any) => param.toJSON());
+            let gameOutput = game.toJSON();
             res.status(success.status).json({ Message: success.message, GameStatus: gameOutput });
         });
     } catch (error) {
@@ -94,6 +102,21 @@ export async function getGame(req: Request, res: Response): Promise<void> {
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
 
+}
+
+/**
+ *  This function sets the inGame status of a player.
+ * 
+ * @param player the player to update
+ * @param status "true" or "false", depending on the desired status.
+ */
+
+export async function updatePlayerInGameStatus(player: any, status: boolean): Promise<void> {
+    try {
+        await User.update({ inGame: status }, { where: { email: player } });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 /**
@@ -107,41 +130,84 @@ export async function getGame(req: Request, res: Response): Promise<void> {
 
 export async function makeMove(req: Request, res: Response): Promise<void> {
     try {
-        const id = req.params.id;
+        const id = req.body.id;
         const move = req.body.move;
 
         await GameTTT.findOne({
-            attributes: ['gameState', 'currentTurn', 'player1', 'player2', 'winner', 'gameMode', 'turnTime'],
+            attributes: ['gameState', 'currentTurn', 'player1', 'player2', 'winner', 'gameMode', 'turnTime', 'gameId'],
             where: { gameId: id }
         }).then((game: any) => {
 
             var newWinner: string = 'TBD';
             var newStatus = 'IN PROGRESS';
 
-            var newGameState = game.gameState;
-            if (req.body.player === game.player1) {
-                newGameState[move] = 'X';
-            } else if (req.body.player === game.player2) {
-                newGameState[move] = 'O';
+            if (game.gameMode == '3D') {
+                var newGameState = game.gameState;
+                if (req.body.player === game.player1) {
+                    newGameState[move[0]][move[1]] = 'X';
+                } else if (req.body.player === game.player2) {
+                    newGameState[move[0]][move[1]] = 'O';
+                }
+
+            } else {
+                var newGameState = game.gameState;
+                if (req.body.player === game.player1) {
+                    newGameState[move] = 'X';
+                } else if (req.body.player === game.player2) {
+                    newGameState[move] = 'O';
+                }
+            }
+            // Necessary formatting to save the move
+
+            if (typeof move === 'number') {
+                var moveArray: number[] = [move]
+            } else {
+                var moveArray: number[] = move;
             }
 
-            saveMove(game.id, game.gameMode, req.body.player, move);
+            saveMove(game.gameId, game.gameMode, req.body.player, moveArray);
 
-            if (hasWon(newGameState)) {
-                var newWinner: string = req.body.player;
-                var newStatus = 'FINISHED';
+            // Victory check, draw check and AI move
+
+            if (game.gameMode == '3D') {
+                if (hasWon3D(newGameState)) {
+                    var newWinner: string = req.body.player;
+                    var newStatus = 'FINISHED';
+                } else if (!hasWon3D(newGameState) && !hasEmptyCells3D(newGameState)) {
+                    console.log('lol wtf?!')
+                    var newStatus = 'FINISHED';
+                    var newWinner = 'DRAW';
+                }
             } else {
-                if (game.player2 == 'AI') {
-                    var engineAI = require('tic-tac-toe-ai-engine');
-                    var newGameState = engineAI.computeMove(newGameState).nextBestGameState;
-                    if (hasWon(newGameState)) {
-                        var newWinner: string = 'AI';
-                        var newStatus = 'FINISHED';
+                if (hasWon(newGameState)) {
+                    var newWinner: string = req.body.player;
+                    var newStatus = 'FINISHED';
+                } else if (!hasWon(newGameState) && !(newGameState.indexOf('') == -1)) {
+                    if (game.player2 == 'AI') {
+                        var engineAI = require('tic-tac-toe-ai-engine');
+                        var newGameState = engineAI.computeMove(newGameState).nextBestGameState;
+                        if (hasWon(newGameState)) {
+                            var newWinner = 'AI';
+                            var newStatus = 'FINISHED';
+                        }
                     }
+                } else if (!hasWon(newGameState) && newGameState.indexOf('') == -1) {
+                    var newStatus = 'FINISHED';
+                    var newWinner = 'DRAW';
                 }
             }
 
-            let newTurn = game.currentTurn == game.player1 ? game.player2 : game.player1;
+            // Turn checks and inGame checks
+
+            if (newStatus != 'FINISHED') {
+                var newTurn = game.currentTurn == game.player1 ? game.player2 : game.player1;
+            } else {
+                var newTurn = game.currentTurn;
+                updatePlayerInGameStatus(game.player1, false);
+                if (game.player2 != 'AI') {
+                    updatePlayerInGameStatus(game.player2, false);
+                }
+            }
             GameTTT.update({
                 gameState: newGameState,
                 currentTurn: newTurn,
@@ -171,14 +237,14 @@ export async function quitGame(req: Request, res: Response): Promise<void> {
     try {
         await GameTTT.findOne({
             attributes: ['player1', 'player2', 'status', 'currentTurn'],
-            where: { gameId: req.params.id }
+            where: { gameId: req.body.id }
         }).then((game: any) => {
             var newStatus = 'FORFEIT';
             var newWinner = game.currentTurn == game.player1 ? game.player2 : game.player1;
             GameTTT.update({
                 status: newStatus,
                 winner: newWinner
-            }, { where: { gameId: req.params.id } }).then(() => {
+            }, { where: { gameId: req.body.id } }).then(() => {
                 const success = new successHandler.QuitGameSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
                 res.status(success.status).json({ Message: success.message });
@@ -210,6 +276,8 @@ async function saveMove(gameId: number, gameType: string, player: string, move: 
             player: player,
             move: move,
             moveDate: new Date()
+        }).then((move: any) => {
+            console.log('Move saved:' + move.moveId);
         });
     } catch (error) {
         console.log(error);
@@ -278,8 +346,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
 
                 doc.end();
 
-                res.status(200).send();
-
             } else {
                 const success = new successHandler.HistoryMovesSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
@@ -291,4 +357,100 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
         console.log(error);
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
+}
+
+/**
+ * 
+ *  This function calculates the leaderboard based on the number of wins and losses.
+ * 
+ * @param req 
+ * @param res 
+ */
+
+export async function getLeaderboard(req: Request, res: Response): Promise<void> {
+
+    try {
+
+        const { Op } = require('sequelize');
+
+        async function getWins(userId: string) {
+            const wins = await GameTTT.count({
+                where: {
+                    winner: userId
+                }
+            });
+            return wins;
+        }
+
+        async function getLosses(userId: string) {
+            const losses = await GameTTT.count({
+                where: {
+                    [Op.or]: [
+                        { player1: userId },
+                        { player2: userId }
+                    ],
+                    winner: {
+                        [Op.not]: userId
+                    }
+                }
+            });
+            return losses;
+        }
+
+        async function getForfeitWins(userId: string) {
+            const forfeitWins = await GameTTT.count({
+                where: {
+                    winner: userId,
+                    status: 'FORFEIT'
+                }
+            });
+            return forfeitWins;
+        }
+
+        async function getForfeitLosses(userId: string) {
+            const forfeitLosses = await GameTTT.count({
+                where: {
+                    [Op.or]: [
+                        { player1: userId },
+                        { player2: userId }
+                    ],
+                    winner: {
+                        [Op.not]: userId
+                    },
+                    status: 'FORFEIT'
+                }
+            });
+            return forfeitLosses;
+        }
+
+        // Calculate the leaderboard for all users
+
+        const users: any = await User.findAll();
+
+        var lb: any = {};
+
+        for (let user of users) {
+
+            const wins = await getWins(user.email);
+            const losses = await getLosses(user.email);
+            const forfeitWins = await getForfeitWins(user.email);
+            const forfeitLosses = await getForfeitLosses(user.email);
+            lb[user.email] = {
+                wins: wins,
+                losses: losses,
+                forfeitWins: forfeitWins,
+                forfeitLosses: forfeitLosses
+            };
+
+        }
+
+        res.header('Content-Type', 'application/json');
+        res.status(HttpStatusCode.OK).json({ Message: successHandler.LeaderboardSuccess, Leaderboard: lb });
+
+    } catch (error) {
+        console.log(error);
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
+    }
+
+
 }

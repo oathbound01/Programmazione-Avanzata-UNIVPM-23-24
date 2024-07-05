@@ -22,12 +22,13 @@ module.exports = {
       },
       player2: {
         type: Sequelize.STRING,
-        references: {
-          model: 'users',
-          key: 'email'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        allowNull: false
+        //references: {
+        //  model: 'users',
+        //  key: 'email'
+        //},
+        //onUpdate: 'CASCADE',
+        //onDelete: 'CASCADE'
       },
       startTime: {
         type: Sequelize.DATE,
@@ -55,7 +56,7 @@ module.exports = {
       },
       winner: {
         type: Sequelize.STRING,
-        defaultValue: "The game is not finished"
+        defaultValue: "IN PROGRESS"
       },
       createdAt: {
         allowNull: false,

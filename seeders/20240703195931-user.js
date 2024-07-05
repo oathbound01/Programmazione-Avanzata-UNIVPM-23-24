@@ -9,18 +9,14 @@ module.exports = {
         password: 'password1',
         role: 'admin',
         token: 123456789,
-        inGame: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        inGame: true
       },
       {
         email: 'user2@example.com',
         password: 'password2',
         role: 'user',
         token: 987654321,
-        inGame: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        inGame: false
       }
     ], {});
   },

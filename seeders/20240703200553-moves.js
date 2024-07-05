@@ -5,54 +5,45 @@ module.exports = {
     await queryInterface.bulkInsert('moves', [
       {//tic-tac-toe
         gameId: 1,
-        player: 'player1@example.com',
-        move: [1, 1], //(row, column)
-        gameType: 'tic-tac-toe',
+        player: 'user1@example.com',
+        move: [1, null],
+        gameType: 'AI',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         gameId: 1,
-        player: 'player2@example.com',
-        move: [1, 2],
-        gameType: 'tic-tac-toe',
-        moveDate: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        gameId: 1,
-        player: 'player1@example.com',
-        move: [2, 2],
-        gameType: 'tic-tac-toe',
+        player: 'user1@example.com',
+        move: [2, null],
+        gameType: 'AI',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {//tic-tac-toe-3d
         gameId: 2,
-        player: 'player1@example.com',
-        move: [1, 1, 1], //(row, column, depth)
-        gameType: 'tic-tac-toe-3d',
+        player: 'user1@example.com',
+        move: [2, 2], 
+        gameType: '3D',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         gameId: 2,
-        player: 'player2@example.com',
-        move: [1, 2, 2],
-        gameType: 'tic-tac-toe-3d',
+        player: 'user2@example.com',
+        move: [4, 2],
+        gameType: '3D',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         gameId: 2,
-        player: 'player1@example.com',
-        move: [2, 2, 3],
-        gameType: 'tic-tac-toe-3d',
+        player: 'user1@example.com',
+        move: [2, 3],
+        gameType: '3D',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()

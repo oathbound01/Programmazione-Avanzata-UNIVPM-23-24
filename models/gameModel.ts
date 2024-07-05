@@ -12,10 +12,10 @@ export const GameTTT = sequelize.define('games', {
             model: User,
             key: 'email',
         }},
-        player2: {type: DataTypes.STRING, references: {
+        player2: {type: DataTypes.STRING, /**references: {
             model: User,
             key: 'email',
-        }},
+        }*/},
         startTime: {type: DataTypes.DATE, allowNull: false},
         turnTime: {type: DataTypes.DATE, allowNull: false},
         currentTurn: {type: DataTypes.STRING, allowNull: false},

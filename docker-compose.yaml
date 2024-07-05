@@ -3,17 +3,20 @@ services:
     build: .
     ports:
       - "8080:3000"
+    container_name: backend
     env_file:
       - .env
     environment:
       - NODE_ENV=${NODE_ENV}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - .:/usr/app
   db:
     image: postgres:latest
     restart: unless-stopped
+    container_name: pg-db
     environment:
      - POSTGRES_DB=${DB_NAME}
      - POSTGRES_USER=${DB_USER}
@@ -25,6 +28,8 @@ services:
     - '${DB_PORT}:${DB_PORT}'
     volumes:
     - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: "exit 0"
 
 volumes:
   pg_data:

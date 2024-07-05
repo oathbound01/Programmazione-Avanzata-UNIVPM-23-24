@@ -12,7 +12,7 @@ module.exports = {
         autoIncrement: true
       },
       gameId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'games',
