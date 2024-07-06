@@ -1,5 +1,6 @@
 import express, {Application, Request, Response} from 'express';
 import * as gameMaster from './controller/gameMaster';
+import * as valMiddleware from './middleware/valMiddleware';
 
 const app : Application = express();
 app.use(express.json());
@@ -8,15 +9,15 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!');
 });
 
-app.post('/newGame', (req: Request, res: Response) => {
-    gameMaster.newGame(req, res)
-    }); 
+app.post('/newGame', valMiddleware.validateGameCreation, (req: any, res: any) => {
+    gameMaster.newGame(req, res) 
+}); 
 
 app.get('/getGame', (req: Request, res: Response) => {
     gameMaster.getGame(req, res)
     });
 
-app.post('/makeMove', (req: Request, res: Response) => {
+app.post('/makeMove',(req: Request, res: Response) => {
     gameMaster.makeMove(req, res)
     });
 

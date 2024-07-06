@@ -7,13 +7,13 @@ module.exports = {
       {
         email: 'user1@example.com',
         role: 'admin',
-        token: 20.00,
+        credits: 20.00,
         inGame: true
       },
       {
         email: 'user2@example.com',
         role: 'user',
-        token: 5.00,
+        credits: 5.00,
         inGame: false
       }
     ], {});

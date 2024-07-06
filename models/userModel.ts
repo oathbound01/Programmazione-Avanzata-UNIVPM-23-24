@@ -1,6 +1,5 @@
 import {DBAccess} from "../db-connection/database";
 import {DataTypes, Sequelize} from 'sequelize';
-import {TokenError, UserNotFound} from "../messages/errorMessages";
 
 //Connection to DataBase
 const sequelize: Sequelize = DBAccess.getInstance();
@@ -22,7 +21,7 @@ export const User = sequelize.define('users', {
     //freezeTableName: true
 });
 
-export async function getUserToken(userEmail: string) {
+export async function getUserCredits(userEmail: string) {
     return await User.findOne({
         raw: true,
         attributes: ['credits'],
@@ -31,3 +30,13 @@ export async function getUserToken(userEmail: string) {
         }
     });
 }
+
+export async function getUserID(email:string):Promise<any> {
+    let result:any;
+    try{
+        result = await User.findByPk(email,{raw:true});
+    }catch{
+        console.log("Database Server Error")
+    }
+    return result;
+};
