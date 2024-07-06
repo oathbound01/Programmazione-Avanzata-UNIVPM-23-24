@@ -1,4 +1,5 @@
-import * as validate from "./valMiddleware"
+import * as game from './gameMiddleware';
+import * as auth from './authMiddleware';
 
 /**
  * 
@@ -9,50 +10,50 @@ import * as validate from "./valMiddleware"
 
 
 export const gameCreation = [
-    validate.verifyAndAuthenticate,
-    validate.checkUserExists,
-    // validate.checkOppoentExists,
-    validate.validateGameCreation,
-    // validate.checkUserCredits,
-    validate.checkUserInGame
+    auth.verifyAndAuthenticate,
+    auth.checkUserExists,
+    auth.checkOpponentExists,
+    game.validateGameCreation,
+    // game.checkUserCredits,
+    game.checkUserInGame
 ]
 
 export const gameRetrieval = [
-    validate.verifyAndAuthenticate,
-    validate.checkUserExists,
-    // validate.checkGameExists,
+    auth.verifyAndAuthenticate,
+    auth.checkUserExists,
+    // game.checkGameExists,
 ]
 
 export const gameMove = [
-    validate.verifyAndAuthenticate,
-    validate.checkUserExists,
-    // validate.checkGameExists,
-    //validate.checkGameParticipation,
-    validate.validateMoveGame,
-    // validate.checkMoveTime,
+    auth.verifyAndAuthenticate,
+    auth.checkUserExists,
+    // game.checkGameExists,
+    // game.checkGameParticipation,
+    game.validateMoveGame,
+    // game.checkMoveTime,
 ]
 
 export const gameQuit = [
-    validate.verifyAndAuthenticate,
-    validate.checkUserExists,
-    //validate.validateQuitGame
+    auth.verifyAndAuthenticate,
+    auth.checkUserExists,
+    game.validateQuitGame
 ]
 
 export const moveHistory = [
-    validate.verifyAndAuthenticate,
-    validate.checkUserExists,
-    //validate.checkHistoryFileType
-    //validate.checkValidDates
+    auth.verifyAndAuthenticate,
+    auth.checkUserExists,
+    //misc.checkHistoryFileType
+    //misc.checkValidDates
 ]
 
 export const leaderboard = [
-    // validate.checkLeaderboardFileType
-    // validate.checkFilters
+    // misc.checkLeaderboardFileType
+    // misc.checkLeaderboardFilters
 ]
 
 export const giveCredits = [
-    validate.verifyAndAuthenticate,
-    validate.checkUserExists,
-    validate.checkAdmin,
-    // validate.checkRecharge
+    auth.verifyAndAuthenticate,
+    auth.checkUserExists,
+    auth.checkAdmin,
+    // misc.checkRecharge
 ]
