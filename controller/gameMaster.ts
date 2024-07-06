@@ -436,6 +436,30 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
             return forfeitLosses;
         }
 
+        async function getAIWins(userId: string) {
+            const aiWins = await GameTTT.count({
+                where: {
+                    player1: userId,
+                    player2: 'AI',
+                    winner: userId
+                }
+            });
+            return aiWins;
+        }
+
+        async function getAILosses(userId: string) {
+            const aiLosses = await GameTTT.count({
+                where: {
+                    player1: userId,
+                    player2: 'AI',
+                    winner: {
+                        [Op.not]: userId
+                    }
+                }
+            });
+            return aiLosses;
+        }
+
         // Calculate the leaderboard for all users
 
         const users: any = await User.findAll();
@@ -448,11 +472,15 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
             const losses = await getLosses(user.email);
             const forfeitWins = await getForfeitWins(user.email);
             const forfeitLosses = await getForfeitLosses(user.email);
+            const aiWins = await getAIWins(user.email);
+            const aiLosses = await getAILosses(user.email);
             lb[user.email] = {
                 wins: wins,
                 losses: losses,
                 forfeitWins: forfeitWins,
-                forfeitLosses: forfeitLosses
+                forfeitLosses: forfeitLosses,
+                aiWins: aiWins,
+                aiLosses: aiLosses
             };
 
         }
@@ -481,7 +509,7 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
 
             // This function is the hackiest thing I've ever wrote, I hate csv.
 
-            let headers: string[] = ['User', 'Wins', 'Losses', 'Forfeit Wins', 'Forfeit Losses'];
+            let headers: string[] = ['User', 'Wins', 'Losses', 'Forfeit Wins', 'Forfeit Losses', 'Wins against AI', 'Losses against AI'];
             let values: any[] = Object.values(Object.values(lb));
             let emails = Object.keys(lb);
             let data: any[][] = [];
