@@ -1,7 +1,6 @@
 import e, { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User, getUserID } from "../models/userModel";
-import { insertNewGame } from "../models/gameModel";
 import {
     GameIdBadRequest,
     InGame,
@@ -101,7 +100,9 @@ export async function validateQuitGame(req: Request, res: Response, next: NextFu
         return res.status(400).send("User is required");
     }
     if (!gameId || typeof gameId !== 'number' || gameId <= 0) {
-        return new GameIdBadRequest().getResponse();
+        const error = new GameIdBadRequest().getResponse();
+        res.header('Content-Type', 'application/json');
+        res.status(error.status).json({ error: error.message});
     }
     next();
 }
@@ -110,9 +111,13 @@ export async function validateQuitGame(req: Request, res: Response, next: NextFu
 export async function validateMoveGame(req: Request, res: Response, next: NextFunction) {
     const { gameId, move } = req.body;
     if (!gameId || typeof gameId !== 'number' || gameId <= 0) {
-        return new GameIdBadRequest().getResponse();
+        const error = new GameIdBadRequest().getResponse();
+        res.header('Content-Type', 'application/json');
+        res.status(error.status).json({ error: error.message });
     } else if (!move || typeof move !== 'number' || move < 0) {
-        return new MoveError().getResponse();
+        const error = new MoveError().getResponse();
+        res.header('Content-Type', 'application/json');
+        res.status(error.status).json({ error: error.message });
     }
     next();
 }
@@ -130,31 +135,36 @@ export async function checkUserInGame(req: any, res: any, next: any) {
         });
         if (!creatorUser) {
             const errorResponse = new UserNotFound().getResponse();
+            res.header('Content-Type', 'application/json');
             return res.status(errorResponse.status).json({ error: errorResponse.message });
         }
         if (creatorUser.getDataValue('inGame')) {
             const errorResponse = new InGame().getResponse();
+            res.header('Content-Type', 'application/json');
             return res.status(errorResponse.status).json({ error: errorResponse.message });
+        }
+         // Check for AI opponent early return if opponentType is 'ai'
+         if (player2 === 'AI') {
+            // No need to check for AI's availability as it's always available
+            next();
         }
         const opponentUser = await User.findOne({
             where: { email: player2 }
         });
         if (!opponentUser) {
             const errorResponse = new UserNotFound().getResponse();
+            res.header('Content-Type', 'application/json');
             return res.status(errorResponse.status).json({ error: errorResponse.message });
         }
         if (opponentUser.getDataValue('inGame')) {
             const errorResponse = new InGame().getResponse();
-            return res.status(errorResponse.status).json({ error: errorResponse.message });
+            res.header('Content-Type', 'application/json');
+            res.status(errorResponse.status).json({ error: errorResponse.message });
         }
         next();
-        // Check for AI opponent early return if opponentType is 'ai'
-        if (player2 === 'ai') {
-            // No need to check for AI's availability as it's always available
-            next();
-        }
     } catch (error: any) {
         const errorResponse = new PlayedGameError().getResponse();
-        return res.status(errorResponse.status).json({ error: errorResponse.message });
+        res.header('Content-Type', 'application/json');
+        res.status(errorResponse.status).json({ error: errorResponse.message });
     }
 }
