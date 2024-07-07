@@ -35,12 +35,10 @@ const MOVE_COST = 0.05;
  */
 
 export async function newGame(req: Request, res: Response): Promise<void> {
-
     // gameState may vary depending on the game mode.
 
     var gameState: string[] | string[][];
-
-    console.log(req.body);
+    const playerOne: string = req.body.user.email;
 
     try {
         if (req.body.gameMode == '3D') {
@@ -52,22 +50,23 @@ export async function newGame(req: Request, res: Response): Promise<void> {
         await GameTTT.create({
             gameMode: req.body.gameMode,
             startTime: new Date(),
-            player1: req.body.playerOne,
+            player1: playerOne,
             player2: req.body.gameOpponent,
             status: 'IN PROGRESS',
             turnTime: req.body.turnTime,
-            currentTurn: req.body.playerOne,
+            currentTurn: req.body.user.email,
             gameState: gameState,
             winner: 'TBD',
         }).then((game: any) => {
 
-            updatePlayerInGameStatus(req.body.playerOne, true);
+            // Updates the inGame status of the players and charges the user for the game.
 
+            updatePlayerInGameStatus(playerOne, true);
             if (req.body.gameOpponent != 'AI') {
                 updatePlayerInGameStatus(req.body.gameOpponent, true);
-                chargeUser(PVP_GAME_COST, req.body.playerOne);
+                chargeUser(PVP_GAME_COST, playerOne);
             } else {
-                chargeUser(AI_GAME_COST, req.body.playerOne);
+                chargeUser(AI_GAME_COST, playerOne);
             }
 
             const success = new successHandler.CreateGameSuccess().getResponse();
@@ -95,14 +94,6 @@ export async function getGame(req: Request, res: Response): Promise<void> {
             attributes: ['status', 'player1', 'player2', 'currentTurn', 'gameState', 'winner'],
             where: { gameId: id }
         }).then((game: any) => {
-
-            // Set player inGame status to true
-
-            updatePlayerInGameStatus(game.player1, true);
-            if (game.player2 != 'AI') {
-                updatePlayerInGameStatus(game.player2, true);
-            }
-
             const success = new successHandler.StatusGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
             let gameOutput = game.toJSON();
@@ -141,30 +132,31 @@ export async function updatePlayerInGameStatus(player: any, status: boolean): Pr
 
 export async function makeMove(req: Request, res: Response): Promise<void> {
     try {
-        const id = req.body.id;
-        const move = req.body.move;
+        const id: number = req.body.id;
+        // Typescript doesn't like multidimensional array indexing.
+        const move: any = req.body.move;
+        const player: string = req.body.user.email;
 
         await GameTTT.findOne({
             attributes: ['gameState', 'currentTurn', 'player1', 'player2', 'winner', 'gameMode', 'turnTime', 'gameId'],
             where: { gameId: id }
         }).then((game: any) => {
-
             var newWinner: string = 'TBD';
             var newStatus = 'IN PROGRESS';
 
             if (game.gameMode == '3D') {
                 var newGameState = game.gameState;
-                if (req.body.player === game.player1) {
+                if (player === game.player1) {
                     newGameState[move[0]][move[1]] = 'X';
-                } else if (req.body.player === game.player2) {
+                } else if (player === game.player2) {
                     newGameState[move[0]][move[1]] = 'O';
                 }
 
             } else {
                 var newGameState = game.gameState;
-                if (req.body.player === game.player1) {
+                if (player === game.player1) {
                     newGameState[move] = 'X';
-                } else if (req.body.player === game.player2) {
+                } else if (player === game.player2) {
                     newGameState[move] = 'O';
                 }
             }
@@ -176,26 +168,25 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
                 var moveArray: number[] = move;
             }
 
-            saveMove(game.gameId, game.gameMode, req.body.player, moveArray);
+            saveMove(game.gameId, game.gameMode, player, moveArray);
 
             // Victory check, draw check and AI move
 
             if (game.gameMode == '3D') {
                 if (hasWon3D(newGameState)) {
-                    var newWinner: string = req.body.player;
+                    var newWinner: string = player;
                     var newStatus = 'FINISHED';
                 } else if (!hasWon3D(newGameState) && !hasEmptyCells3D(newGameState)) {
-                    console.log('lol wtf?!')
                     var newStatus = 'FINISHED';
                     var newWinner = 'DRAW';
                 }
             } else {
                 if (hasWon(newGameState)) {
-                    var newWinner: string = req.body.player;
+                    var newWinner: string = player;
                     var newStatus = 'FINISHED';
                 } else if (!hasWon(newGameState) && !(newGameState.indexOf('') == -1)) {
                     if (game.player2 == 'AI') {
-                        var engineAI = require('tic-tac-toe-ai-engine');
+                        let engineAI = require('tic-tac-toe-ai-engine');
                         var newGameState = engineAI.computeMove(newGameState).nextBestGameState;
                         if (hasWon(newGameState)) {
                             var newWinner = 'AI';
@@ -227,7 +218,7 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
             }, { where: { gameId: id } }).then(() => {
 
                 // Charge the player for the move
-                chargeUser(MOVE_COST, req.body.player);
+                chargeUser(MOVE_COST, player);
 
                 const success = new successHandler.MoveSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
@@ -255,7 +246,7 @@ export async function quitGame(req: Request, res: Response): Promise<void> {
             where: { gameId: req.body.id }
         }).then((game: any) => {
             var newStatus = 'FORFEIT';
-            var newWinner = game.currentTurn == game.player1 ? game.player2 : game.player1;
+            var newWinner = req.body.user.email == game.player1 ? game.player2 : game.player1;
             GameTTT.update({
                 status: newStatus,
                 winner: newWinner
@@ -308,9 +299,8 @@ async function saveMove(gameId: number, gameType: string, player: string, move: 
 
 export async function getMoveHistory(req: Request, res: Response): Promise<void> {
     try {
-
         const { Op } = require('sequelize');
-        const player = req.body.player;
+        const player = req.body.user.email;
 
         // Sets up filter types.
         // Default filter is only the player's id
@@ -320,7 +310,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
             gameType?: string | null,
             moveDate?: object | null
         };
-
         let filters: FilterType = {
             player: player
         };
@@ -328,7 +317,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
         if (req.body.gameType) {
             filters['gameType'] = req.body.gameType;
         }
-
         if (req.body.upperDate || req.body.lowerDate) {
             if (req.body.upperDate && req.body.lowerDate) {
                 filters['moveDate'] = {
@@ -381,7 +369,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
  */
 
 export async function getLeaderboard(req: Request, res: Response): Promise<void> {
-
     try {
 
         const { Op } = require('sequelize');
@@ -461,9 +448,7 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
         }
 
         // Calculate the leaderboard for all users
-
         const users: any = await User.findAll();
-
         var lb: any | object = {};
 
         for (let user of users) {
@@ -514,27 +499,21 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
             let emails = Object.keys(lb);
             let data: any[][] = [];
             data.push(headers);
-
             for (let i = 0; i < values.length; i++) {
                 let row = Object.values(values[i]);
                 row.unshift(emails[i]);
                 data.push(row);
             }
-
             let output = csv.stringify(data);
             res.header('Content-Type', 'text/csv');
             res.status(HttpStatusCode.OK).send(output);
-
         } else if (req.body.fileType === 'JSON' || req.body.fileType === 'json' || !req.body.fileType) {
             res.header('Content-Type', 'application/json');
             const success = new successHandler.LeaderboardSuccess().getResponse();
             res.status(success.status).json({ Message: success.message, Leaderboard: lb });
         }
-
     } catch (error) {
         console.log(error);
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
     }
-
-
 }
