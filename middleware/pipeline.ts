@@ -1,5 +1,6 @@
 import * as game from './gameMiddleware';
 import * as auth from './authMiddleware';
+import * as misc from './miscMiddleware';
 
 /**
  * 
@@ -42,18 +43,18 @@ export const gameQuit = [
 export const moveHistory = [
     auth.verifyAndAuthenticate,
     auth.checkUserExists,
-    //misc.checkHistoryFileType
-    //misc.checkValidDates
+    misc.checkHistoryFileType,
+    misc.checkValidDates
 ]
 
 export const leaderboard = [
-    // misc.checkLeaderboardFileType
-    // misc.checkLeaderboardFilters
+    misc.checkLeaderboardFileType,
+    misc.checkLeaderboardFilters
 ]
 
 export const giveCredits = [
     auth.verifyAndAuthenticate,
     auth.checkUserExists,
     auth.checkAdmin,
-    // misc.checkRecharge
+    misc.checkRecharge
 ]

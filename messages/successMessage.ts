@@ -54,11 +54,11 @@ export class GetTokenSuccess implements Message {
     }
 }
 
-export class ChargeTokenSuccess implements Message {
+export class RechargeSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
-            message: "Token successfully charged",
+            message: "Credits successfully recharged",
         };
     }
 }

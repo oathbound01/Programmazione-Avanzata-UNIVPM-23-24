@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize";
 import { User } from "../models/userModel";
+import { Request, Response } from "express";
+import { RechargeSuccess } from "../messages/successMessage";
 
 /**
  * 
@@ -34,18 +36,23 @@ export async function chargeUser(amount: number, user: string): Promise<void> {
  * 
  * @param amount The amount of credits that the user will get back
  * @param user The user to have their credits recharged.
- * @returns Nothing
+ * @returns
  */
 
-export async function giveCredits(amount: number, user: string): Promise<void> {
+export async function giveCredits(req: Request, res: Response): Promise<void> {
     try {
+        const amount: number = req.body.amount;
+        const recipient: string = req.body.recipient;
         await User.update({
-            credit: Sequelize.literal(`credit + ${amount}`)
+            credits: Sequelize.literal(`credits + ${amount}`)
         }, {
             where: {
-                email: user
+                email: recipient
             }
         });
+        res.header('content-type', 'application/json');
+        const success = new RechargeSuccess().getResponse();
+        res.status(success.status).json({ message: success.message });
     } catch (error) {
         console.error(error);
     }

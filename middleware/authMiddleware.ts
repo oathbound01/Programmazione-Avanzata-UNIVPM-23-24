@@ -6,7 +6,7 @@ import {
     InGame,
     MissingAuthorization,
     PlayedGameError, TimeLimit,
-    TokenError,
+    GetTokenError,
     UserNotFound,
     MoveError,
     CreateGameError
@@ -20,22 +20,31 @@ import {
  * it logs the error and calls the next middleware with the error.
 **/
 export const verifyAndAuthenticate = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-        return next(MissingAuthorization);
-    }
     try {
-        const secretKey = process.env.SECRET_KEY;
-        if (!secretKey) {
-            console.error('SECRET_KEY is not defined in the environment variables.');
-            return next(new Error('Internal Server Error'));
+        const { authorization } = req.headers;
+        if (!authorization) {
+            res.header('content-type', 'application/json')
+            const error = new MissingAuthorization().getResponse();
+            return res.status(error.status).json({ error: error.message });
         }
-        const decoded = jwt.verify(token, secretKey, { algorithms: ['RS256'] });
+        const token: string = req.headers.authorization!.split(' ')[1];
+        if (!process.env.PRIVATE_KEY) {
+            console.error('PRIVATE_KEY is not defined in the environment variables.');
+            res.status(500).send('Internal Server Error');
+        }
+        const privateKey: string = process.env.PRIVATE_KEY!;
+        const decoded = jwt.verify(token, privateKey, { algorithms: ['RS256'] });
+        if (!decoded) {
+            res.header('content-type', 'application/json')
+            const error = new GetTokenError().getResponse();
+            res.status(error.status).json({ error: error.message });
+        }
         req.body.user = decoded; // Attach decoded token to a new property
         next();
     } catch (error) {
-        console.error(TokenError);
-        next(TokenError);
+        console.log(error);
+        res.header('content-type', 'application/json')
+        res.status(500).send('Bad Request body');
     }
 };
 
@@ -46,7 +55,9 @@ export function checkAdmin(req: any, res: any, next: any): void {
     if (req.body.user.role === 'admin') {
         next();
     } else {
-        next(MissingAuthorization);
+        res.header('content-type', 'application/json')
+        const error = new MissingAuthorization().getResponse();
+        res.status(error.status).json({ error: error.message });
     }
 }
 
@@ -55,17 +66,42 @@ export function checkAdmin(req: any, res: any, next: any): void {
  * If the user is not found, it returns an error message.
 **/
 export function checkUserExists(req: any, res: any, next: any): void {
-    const user = req.body;
-    if (!getUserID(user.email)) {
-        next(UserNotFound);
-    } else {
-        next();
+    try {
+        const user = req.body;
+        if (!getUserID(user.email)) {
+            res.header('content-type', 'application/json')
+            const error = new UserNotFound().getResponse();
+            res.status(error.status).json({ error: error.message });
+        } else {
+            next();
+        }
+    } catch (error) {
+        console.error(error);
+        res.header('content-type', 'application/json')
+        res.status(500).send('Internal Server Error');
     }
 }
 
+/**
+ * 
+ *  This funcion check is the user specified a valid opponent.
+ * 
+ * @param req 
+ * @param res 
+ * @param next 
+ */
+
 export function checkOpponentExists(req: any, res: any, next: any): void {
-    const opponent = req.body.gameOpponent;
-    if (!getUserID(opponent)) {
-        next(UserNotFound);
+    try {
+        const opponent = req.body.gameOpponent;
+        if (!getUserID(opponent)) {
+            res.header('content-type', 'application/json')
+            const error = new UserNotFound().getResponse();
+            res.status(error.status).json({ error: error.message });
+        }
+    } catch (error) {
+        console.error(error);
+        res.header('content-type', 'application/json')
+        res.status(500).send('Internal Server Error');
     }
 }
