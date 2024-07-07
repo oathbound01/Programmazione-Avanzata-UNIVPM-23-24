@@ -36,6 +36,9 @@ We implement a system to manage the game of Tic Tac Toe. In particular, the syst
 ### Route: \leaderboard
 ![Diagramma dei casi d'uso - Leaderboard (1)](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/44dbe94d-e84d-4d82-920e-83e8641a5ca2)
 
+### Route: \getCredits
+![Diagramma dei casi d'uso - CheckCredit](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/15f9817e-8038-4751-b0f3-7f136e880de3)
+
 ### Route: \recharge
 ![Diagramma dei casi d'uso - AddCredit](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/81b62654-27e8-4b59-a589-5fa44f8cb2ec)
 
@@ -49,6 +52,7 @@ We implement a system to manage the game of Tic Tac Toe. In particular, the syst
 | \getMoves      | GET    | Get all moves of a game           |        Yes         |
 | \quitGame      | POST   | Quit the current game             |        Yes         |
 | \leaderboard   | GET    | Get the leaderboard               |        No          |
+| \getCredits    | Get    | Get user credits                  |        Yes         | 
 | \recharge      | POST   | Recharge user credits             |        Yes         | 
 
 
