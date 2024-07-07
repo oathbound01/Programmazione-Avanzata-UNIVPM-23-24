@@ -1,3 +1,4 @@
+import e from "express";
 import {Message, Response, HttpStatusCode} from "./message";
 
 export class CreateGameError implements Message {
@@ -27,6 +28,43 @@ export class UserNotFound implements Message {
     }
 }
 
+export class NoUserId implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.NO_CONTENT,
+            message: "Invalid player ID(s)",
+        };
+    }
+}
+
+export class NoBody implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Invalid request body",
+        };
+    }
+}
+
+export class NoContent implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.NO_CONTENT,
+            message: "Missing required fields",
+        };
+    }
+
+}
+
+export class GameModeError implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Invalid game mode",
+        };
+    }
+}
+
 export class InGame implements Message {
     getResponse(): Response {
         return {
@@ -50,6 +88,15 @@ export class TimeLimit implements Message {
         return {
             status: HttpStatusCode.REQUEST_TIMEOUT,
             message: "Invalid time limit",
+        };
+    }
+}
+
+export class TimeBadRequest implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Invalid turn time",
         };
     }
 }
@@ -99,7 +146,7 @@ export class GetTokenError implements Message {
     }
 }
 
-export class TokenError implements Message {
+export class CreditsError implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.PAYMENT_REQUIRED,
@@ -108,7 +155,7 @@ export class TokenError implements Message {
     }
 }
 
-export class ChargeTokenError implements Message {
+export class ChargeCreditsError implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.INTERNAL_SERVER_ERROR,
@@ -207,7 +254,7 @@ export class LeaderboardBadRequest implements Message {
     }
 }
 
-export class ChargeTokenBadRequest implements Message {
+export class ChargeCreditsBadRequest implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.BAD_REQUEST,

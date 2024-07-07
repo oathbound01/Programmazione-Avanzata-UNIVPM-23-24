@@ -14,23 +14,23 @@ export const gameCreation = [
     auth.checkUserExists,
     auth.checkOpponentExists,
     game.validateGameCreation,
-    // game.checkUserCredits,
+    game.checkUserCredits,
     game.checkUserInGame
 ]
 
 export const gameRetrieval = [
     auth.verifyAndAuthenticate,
     auth.checkUserExists,
-    // game.checkGameExists,
+    game.checkGameExists,
 ]
 
 export const gameMove = [
     auth.verifyAndAuthenticate,
     auth.checkUserExists,
-    // game.checkGameExists,
-    // game.checkGameParticipation,
+    game.checkGameExists,
+    game.checkGameParticipation,
     game.validateMoveGame,
-    // game.checkMoveTime,
+    game.checkMoveTime,
 ]
 
 export const gameQuit = [
