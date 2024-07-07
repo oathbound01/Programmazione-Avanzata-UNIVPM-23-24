@@ -22,13 +22,14 @@ export const User = sequelize.define('users', {
 });
 
 export async function getUserCredits(userEmail: string) {
-    return await User.findOne({
-        raw: true,
-        attributes: ['credits'],
-        where: {
-            email: userEmail
-        }
-    });
+    try {
+        const user = await User.findByPk(userEmail);
+        let credits = Number(user!.getDataValue('credits'));
+        return credits;
+    } catch (error) {
+        console.log('Database Server Error');
+        return null;
+    }
 }
 
 export async function getUserID(email:string):Promise<any> {

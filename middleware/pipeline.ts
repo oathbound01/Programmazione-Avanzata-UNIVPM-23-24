@@ -37,7 +37,8 @@ export const gameMove = [
 export const gameQuit = [
     auth.verifyAndAuthenticate,
     auth.checkUserExists,
-    game.validateQuitGame
+    game.checkGameExists,
+    game.checkGameParticipation,
 ]
 
 export const moveHistory = [
