@@ -1,8 +1,6 @@
 import e, { Request, Response, NextFunction } from 'express';
-import { User, getUserID } from "../models/userModel";
+import { User } from "../models/userModel";
 import { } from "../messages/errorMessages";
-import { DECIMAL } from 'sequelize';
-import { type } from 'os';
 
 const MAX_CREDITS = 20;
 

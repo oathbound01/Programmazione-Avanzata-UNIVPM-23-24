@@ -39,6 +39,10 @@ app.post('/recharge', cor.giveCredits, (req: Request, res: Response) => {
     credManagement.giveCredits(req, res)
 });
 
+// Invalid route
+app.all('*', cor.invalidRoute);
+
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
+

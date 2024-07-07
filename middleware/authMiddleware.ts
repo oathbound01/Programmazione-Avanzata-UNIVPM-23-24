@@ -1,16 +1,12 @@
 import e, { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { User, getUserID } from "../models/userModel";
+import { User } from "../models/userModel";
 import {
-    GameIdBadRequest,
-    InGame,
     MissingAuthorization,
-    PlayedGameError, TimeLimit,
     GetTokenError,
     UserNotFound,
-    MoveError,
-    CreateGameError
 } from "../messages/errorMessages";
+import { get } from 'http';
 
 /**
  * This function verifies the JWT token from the request header.
@@ -67,14 +63,15 @@ export function checkAdmin(req: any, res: any, next: any): void {
 **/
 export function checkUserExists(req: any, res: any, next: any): void {
     try {
-        const user = req.body;
-        if (!getUserID(user.email)) {
+        const user = req.body.user;
+        User.findByPk(user.email).then((result) => {
+        if (!result) {
             res.header('content-type', 'application/json')
             const error = new UserNotFound().getResponse();
             res.status(error.status).json({ error: error.message });
-        } else {
-            next();
         }
+        next();
+        });
     } catch (error) {
         console.error(error);
         res.header('content-type', 'application/json')
@@ -94,14 +91,19 @@ export function checkUserExists(req: any, res: any, next: any): void {
 export function checkOpponentExists(req: any, res: any, next: any): void {
     try {
         const opponent = req.body.gameOpponent;
-        if (!getUserID(opponent)) {
+        if (opponent === 'AI') {
+            return next();
+        }
+        User.findByPk(opponent).then((result) => {
+        if (!result) {
             res.header('content-type', 'application/json')
             const error = new UserNotFound().getResponse();
-            res.status(error.status).json({ error: error.message });
+            return res.status(error.status).json({ error: error.message, opponent: opponent });
         }
+        next();
+    });
     } catch (error) {
-        console.error(error);
-        res.header('content-type', 'application/json')
-        res.status(500).send('Internal Server Error');
+        console.log(error);
+        return res.status(500).send('Internal Server Error');
     }
 }

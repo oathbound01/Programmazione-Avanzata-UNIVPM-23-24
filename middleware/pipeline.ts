@@ -30,7 +30,9 @@ export const gameMove = [
     auth.checkUserExists,
     game.checkGameExists,
     game.checkGameParticipation,
+    game.isGameFinished,
     game.validateMoveGame,
+    game.isYourTurn,
     game.checkMoveTime,
 ]
 
@@ -39,6 +41,7 @@ export const gameQuit = [
     auth.checkUserExists,
     game.checkGameExists,
     game.checkGameParticipation,
+    game.isGameFinished
 ]
 
 export const moveHistory = [
@@ -58,4 +61,10 @@ export const giveCredits = [
     auth.checkUserExists,
     auth.checkAdmin,
     misc.checkRecharge
+]
+
+export const invalidRoute = [
+    (req: any, res: any) => {
+        res.status(404).json({error: 'Route not found'});
+    }
 ]

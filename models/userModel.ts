@@ -32,12 +32,15 @@ export async function getUserCredits(userEmail: string) {
     }
 }
 
-export async function getUserID(email:string):Promise<any> {
-    let result:any;
+/** 
+ * 
+ *  @deprecated 
+ * 
+export async function getUserByID(email:string) {
     try{
-        result = await User.findByPk(email,{raw:true});
+        let result = await User.findByPk(email);
     }catch{
         console.log("Database Server Error")
     }
-    return result;
 };
+*/
