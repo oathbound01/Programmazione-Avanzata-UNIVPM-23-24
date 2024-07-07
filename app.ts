@@ -19,11 +19,11 @@ app.get('/getGame', cor.gameRetrieval, (req: Request, res: Response) => {
     gameMaster.getGame(req, res)
     });
 
-app.post('/makeMove',(req: Request, res: Response) => {
+app.post('/makeMove',cor.gameMove, (req: Request, res: Response) => {
     gameMaster.makeMove(req, res)
     });
 
-app.get('/getMoves', cor.gameMove, (req: Request, res: Response) => {
+app.get('/getMoves', cor.moveHistory, (req: Request, res: Response) => {
     gameMaster.getMoveHistory(req, res)
     });
 
