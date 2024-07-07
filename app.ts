@@ -11,7 +11,7 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!');
 });
 
-app.post('/newGame', gameMiddleware.validateGameCreation, (req: any, res: any) => {
+app.post('/newGame', cor.gameCreation, (req: any, res: any) => {
     gameMaster.newGame(req, res) 
 }); 
 
@@ -19,19 +19,19 @@ app.get('/getGame', cor.gameRetrieval, (req: Request, res: Response) => {
     gameMaster.getGame(req, res)
     });
 
-app.post('/makeMove',(req: Request, res: Response) => {
+app.post('/makeMove',cor.gameMove, (req: Request, res: Response) => {
     gameMaster.makeMove(req, res)
     });
 
-app.get('/getMoves', (req: Request, res: Response) => {
+app.get('/getMoves', cor.moveHistory, (req: Request, res: Response) => {
     gameMaster.getMoveHistory(req, res)
     });
 
-app.post('/quitGame', (req: Request, res: Response) => {
+app.post('/quitGame', cor.gameQuit, (req: Request, res: Response) => {
     gameMaster.quitGame(req, res)
     });
 
-app.get('/leaderboard', (req: Request, res: Response) => {
+app.get('/leaderboard', cor.leaderboard, (req: Request, res: Response) => {
     gameMaster.getLeaderboard(req, res)
 });
 
