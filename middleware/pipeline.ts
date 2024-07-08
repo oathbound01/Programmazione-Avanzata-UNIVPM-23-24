@@ -1,6 +1,7 @@
 import * as game from './gameMiddleware';
 import * as auth from './authMiddleware';
 import * as misc from './miscMiddleware';
+import e from 'express';
 
 /**
  * 
@@ -61,6 +62,12 @@ export const giveCredits = [
     auth.checkUserExists,
     auth.checkAdmin,
     misc.checkRecharge
+]
+
+export const checkCredits = [
+    auth.verifyAndAuthenticate,
+    auth.checkUserExists,
+    misc.checkCreditsExists
 ]
 
 export const invalidRoute = [

@@ -1,7 +1,9 @@
 import { Sequelize } from "sequelize";
-import { User } from "../models/userModel";
-import { Request, Response } from "express";
-import { RechargeSuccess } from "../messages/successMessage";
+import { User, getUserCredits } from "../models/userModel";
+import e, { Request, Response } from "express";
+import { RechargeSuccess, GetCreditsSuccess } from "../messages/successMessage";
+import { GetCreditsError } from "../messages/errorMessages";
+import { SuccessMessageEnum } from "../messages/message";
 
 /**
  * 
@@ -15,7 +17,7 @@ import { RechargeSuccess } from "../messages/successMessage";
 export async function chargeUser(amount: number, user: string): Promise<void> {
     try {
         await User.findByPk(user).then((user: any) => {
-            if (user.credit >= amount) {
+            if (user.credits >= amount) {
                 User.update({
                     credit: Sequelize.literal(`credit - ${amount}`)
                 }, {
@@ -55,5 +57,29 @@ export async function giveCredits(req: Request, res: Response): Promise<void> {
         res.status(success.status).json({ message: success.message });
     } catch (error) {
         console.error(error);
+    }
+}
+
+/**
+ * 
+ *  Function that gets the user's credits.
+ * 
+ * @param user The user to get the credits
+ * @returns The user's credits.
+ */
+export async function getCredits(req: Request, res: Response): Promise<void> {
+    const userEmail = req.body.email; // Accessing the email from the request body
+
+    try {
+        const credits = await getUserCredits(userEmail);
+
+        if (credits !== null) {
+            res.status(200).json({ credits: credits });
+        } else {
+            res.status(404).json({ message: "User not found or database error" });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
     }
 }

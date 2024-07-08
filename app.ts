@@ -35,6 +35,10 @@ app.get('/leaderboard', cor.leaderboard, (req: Request, res: Response) => {
     gameMaster.getLeaderboard(req, res)
 });
 
+app.get('/getCredits', cor.checkCredits,(req: Request, res: Response) => {
+    credManagement.getCredits(req, res)
+});
+
 app.post('/recharge', cor.giveCredits, (req: Request, res: Response) => {
     credManagement.giveCredits(req, res)
 });

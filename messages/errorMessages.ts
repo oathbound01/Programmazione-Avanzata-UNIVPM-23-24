@@ -155,6 +155,15 @@ export class CreditsError implements Message {
     }
 }
 
+export class GetCreditsError implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.PAYMENT_REQUIRED,
+            message: "Failed to show credits",
+        };
+    }
+}
+
 export class ChargeCreditsError implements Message {
     getResponse(): Response {
         return {
