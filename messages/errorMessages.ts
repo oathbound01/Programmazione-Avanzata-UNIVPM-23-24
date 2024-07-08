@@ -1,4 +1,3 @@
-import e from "express";
 import {Message, Response, HttpStatusCode} from "./message";
 
 export class CreateGameError implements Message {
@@ -19,29 +18,20 @@ export class MissingAuthorization implements Message {
     }
 }
 
+export class UnauthorizedUser implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.UNAUTHORIZED,
+            message: "Unauthorized",
+        };
+    }
+}
+
 export class UserNotFound implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.NOT_FOUND,
             message: "User not found",
-        };
-    }
-}
-
-export class NoUserId implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.NO_CONTENT,
-            message: "Invalid player ID(s)",
-        };
-    }
-}
-
-export class NoBody implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid request body",
         };
     }
 }
@@ -78,7 +68,25 @@ export class MoveError implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.BAD_REQUEST,
-            message: "Move failed",
+            message: "Inavlid or missing move format",
+        };
+    }
+}
+
+export class Move3DError implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "3D move must be an array of positions",
+        };
+    }
+}
+
+export class OutOfBounds implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Move is out of bounds",
         };
     }
 }
@@ -101,49 +109,23 @@ export class TimeBadRequest implements Message {
     }
 }
 
-export class PlayedGameError implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.INTERNAL_SERVER_ERROR,
-            message: "Error playing game",
-        };
-    }
-}
-
-export class StatusGameError implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Failed to get game status",
-        };
-    }
-}
-
-export class HistoryMovesError implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.INTERNAL_SERVER_ERROR,
-            message: "Error retrieving history of moves",
-        };
-    }
-}
-
-export class LeaderboardError implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.INTERNAL_SERVER_ERROR,
-            message: "Failed to retrieve leaderboard",
-        };
-    }
-}
-
 export class GetTokenError implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.UNAUTHORIZED,
-            message: "Failed to get token",
+            message: "Invalid or missing token",
         };
     }
+}
+
+export class MissingTokenParams implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.UNAUTHORIZED,
+            message: "Missing or invalid token payload fields",
+        };
+    }
+
 }
 
 export class CreditsError implements Message {
@@ -167,26 +149,26 @@ export class GetCreditsError implements Message {
 export class ChargeCreditsError implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.INTERNAL_SERVER_ERROR,
-            message: "Failed to charge credits",
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Invalid amount of credits",
         };
     }
 }
 
-export class EndMatchError implements Message {
+export class TooManyCreditsError implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.BAD_REQUEST,
-            message: "Failed to end match",
+            message: "New credit amount exceeds maximum credits",
         };
     }
 }
 
-export class QuitGameError implements Message {
+export class GameFinishedError implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.INTERNAL_SERVER_ERROR,
-            message: "Failed to quit game",
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Game is already finished",
         };
     }
 }
@@ -200,83 +182,20 @@ export class DefaultError implements Message {
     }
 }
 
+export class NotPartOfGameError implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.UNAUTHORIZED,
+            message: "You are not in this game",
+        };
+    }
+}
+
 export class NotYourTurnError implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.FORBIDDEN,
             message: "Not your turn",
-        };
-    }
-}
-
-export class CreateMatchBadRequest implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid request to create match",
-        };
-    }
-}
-
-export class MoveBadRequest implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid move request",
-        };
-    }
-}
-
-export class PlayedGameBadRequest implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid request to play game",
-        };
-    }
-}
-
-export class StatusGameBadRequest implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid request for game status",
-        };
-    }
-}
-
-export class HistoryMovesBadRequest implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid request for history of moves",
-        };
-    }
-}
-
-export class LeaderboardBadRequest implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid request for leaderboard",
-        };
-    }
-}
-
-export class ChargeCreditsBadRequest implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid credits charge request",
-        };
-    }
-}
-
-export class EndGameBadRequest implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid request to end game",
         };
     }
 }
@@ -290,13 +209,65 @@ export class GameIdBadRequest implements Message {
     }
 }
 
-export class QuitGameBadRequest implements Message {
+export class GameIdNotFound implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid request to quit game",
+            status: HttpStatusCode.NOT_FOUND,
+            message: "Game ID not found",
         };
     }
 }
 
+export class SamePlayerError implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Players must be different",
+        };
+    }
+}
 
+export class AI3DError implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "You can't play against AI in 3D mode",
+        };
+    }
+}
+
+export class InvalidFileTypeLeaderboad implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Invalid file type. Should be 'csv', 'json' or 'pdf'",
+        };
+    }
+}
+
+export class InvalidFileTypeHistory implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Invalid file type. Should be 'json' or 'pdf'",
+        };
+    }
+}
+
+export class InvalidDateFormat implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Invalid date format",
+        };
+    }
+}
+
+export class InvalidFilter implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.BAD_REQUEST,
+            message: "Invalid filter",
+        };
+    }
+}
