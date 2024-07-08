@@ -1,6 +1,6 @@
 import e, { Request, Response, NextFunction } from 'express';
-import { User, getUserID } from "../models/userModel";
-import { } from "../messages/errorMessages";
+import { User, getUserCredits, getUserID } from "../models/userModel";
+import { CreditsError, GetCreditsError } from "../messages/errorMessages";
 import { DECIMAL } from 'sequelize';
 import { type } from 'os';
 
@@ -140,11 +140,33 @@ export async function checkRecharge(req: Request, res: Response, next: NextFunct
             }
             next();
         });
-        
+
     }
     catch (error) {
         console.error(error);
         res.header('content-type', 'application/json');
         return res.status(400).json("Bad request body");
+    }
+}
+
+/**
+ * This function checks if the credits exists in the database.
+ * If the credits are not found, it returns an error message.
+**/
+export async function checkCreditsExists(req: Request, res: Response, next: NextFunction) {
+    try {
+        const recipient: string = req.body.recipient;
+        if (!getUserCredits(recipient)) {
+            res.header('content-type', 'application/json')
+            const error = new GetCreditsError().getResponse();
+            res.status(error.status).json({ error: error.message });
+        } else {
+            next();
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.header('content-type', 'application/json')
+        res.status(500).send('Internal Server Error');
     }
 }

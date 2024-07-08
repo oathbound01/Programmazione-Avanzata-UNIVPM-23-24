@@ -54,6 +54,16 @@ export class GetTokenSuccess implements Message {
     }
 }
 
+export class GetCreditsSuccess implements Message {
+    getResponse(): Response {
+        return {
+            status: HttpStatusCode.OK,
+            message: "Credits successfully retrieved",
+        };
+    }
+}
+
+
 export class RechargeSuccess implements Message {
     getResponse(): Response {
         return {

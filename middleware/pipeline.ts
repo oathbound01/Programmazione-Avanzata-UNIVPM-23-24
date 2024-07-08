@@ -59,3 +59,9 @@ export const giveCredits = [
     auth.checkAdmin,
     misc.checkRecharge
 ]
+
+export const checkCredits = [
+    auth.verifyAndAuthenticate,
+    auth.checkUserExists,
+    misc.checkCreditsExists
+]
