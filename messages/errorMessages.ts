@@ -121,7 +121,7 @@ export class GetTokenError implements Message {
 export class MissingTokenParams implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.UNAUTHORIZED,
+            status: HttpStatusCode.BAD_REQUEST,
             message: "Missing or invalid token payload fields",
         };
     }
@@ -131,7 +131,7 @@ export class MissingTokenParams implements Message {
 export class CreditsError implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.PAYMENT_REQUIRED,
+            status: HttpStatusCode.UNAUTHORIZED,
             message: "Insufficient credits to create a game",
         };
     }
@@ -140,7 +140,7 @@ export class CreditsError implements Message {
 export class GetCreditsError implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.PAYMENT_REQUIRED,
+            status: HttpStatusCode.INTERNAL_SERVER_ERROR,
             message: "Failed to show credits",
         };
     }
@@ -221,7 +221,7 @@ export class GameIdNotFound implements Message {
 export class SamePlayerError implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.BAD_REQUEST,
+            status: HttpStatusCode.FORBIDDEN,
             message: "Players must be different",
         };
     }
@@ -230,7 +230,7 @@ export class SamePlayerError implements Message {
 export class AI3DError implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.BAD_REQUEST,
+            status: HttpStatusCode.FORBIDDEN,
             message: "You can't play against AI in 3D mode",
         };
     }
