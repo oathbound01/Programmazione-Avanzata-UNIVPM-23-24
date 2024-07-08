@@ -5,6 +5,8 @@ import {
     MissingAuthorization,
     GetTokenError,
     UserNotFound,
+    MissingTokenParams,
+    UnauthorizedUser,
 } from "../messages/errorMessages";
 
 /**
@@ -37,14 +39,14 @@ export const verifyAndAuthenticate = (req: Request, res: Response, next: NextFun
         req.body.user = decoded; // Attach decoded token to a new property
         if (!req.body.user.role || (req.body.user.role !== 'admin' && req.body.user.role !== 'user'))  {
             res.header('content-type', 'application/json')
-            const error = new GetTokenError().getResponse();
+            const error = new MissingTokenParams().getResponse();
             return res.status(error.status).json({ error: error.message });
         }
         next();
     } catch (error) {
         console.log(error);
         res.header('content-type', 'application/json')
-        res.status(500).send({ error: 'Bad Token'});
+        return res.status(400).send({ error: 'Bad Token'});
     }
 };
 
@@ -57,7 +59,7 @@ export function checkAdmin(req: any, res: any, next: any): void {
             next();
         } else {
             res.header('content-type', 'application/json')
-            const error = new MissingAuthorization().getResponse();
+            const error = new UnauthorizedUser().getResponse();
             return res.status(error.status).json({ error: error.message });
         }
     } catch (error) {

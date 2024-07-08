@@ -1,5 +1,4 @@
 // interfaces.ts
-import {MissingAuthorization, UserNotFound} from "./errorMessages";
 
 export interface Response {
     message: string; // message of the response
@@ -8,53 +7,6 @@ export interface Response {
 
 export interface Message {
     getResponse(): Response;
-}
-
-/**
- * Enumeration of success messages.
- */
-export enum SuccessMessageEnum {
-    CreateGameSuccess,
-    MoveSuccess,
-    StatusGameSuccess,
-    HistoryMovesSuccess,
-    LeaderboardSuccess,
-    GetTokenSuccess,
-    ChargeTokenSuccess,
-    EndGameSuccessClose,
-    QuitGameSuccess,
-    DefaultSuccess
-}
-
-/**
- * Enumeration of error messages.
- */
-export enum ErrorMessageEnum {
-    CreateGameError,
-    UserNotFound,
-    MissingAuthorization,
-    InGame,
-    MoveError,
-    PlayedGameError,
-    StatusGameError,
-    HistoryMovesError,
-    LeaderboardError,
-    GetTokenError,
-    ChargeTokenError,
-    EndMatchError,
-    QuitGameError,
-    DefaultError,
-    NotYourTurnError,
-    CreateMatchBadRequest,
-    MoveBadRequest,
-    PlayedGameBadRequest,
-    StatusGameBadRequest,
-    HistoryMovesBadRequest,
-    LeaderboardBadRequest,
-    ChargeTokenBadRequest,
-    EndGameBadRequest,
-    GameIdBadRequest,
-    QuitGameBadRequest,
 }
 
 /**
