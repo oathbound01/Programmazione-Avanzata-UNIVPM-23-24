@@ -1,8 +1,6 @@
 import e, { Request, Response, NextFunction } from 'express';
 import { User, getUserCredits } from "../models/userModel";
 import { CreditsError, GetCreditsError } from "../messages/errorMessages";
-import { DECIMAL } from 'sequelize';
-import { type } from 'os';
 
 const MAX_CREDITS = 20;
 
@@ -19,15 +17,15 @@ const MAX_CREDITS = 20;
 export async function checkHistoryFileType(req: Request, res: Response, next: NextFunction) {
     try {
         const fileType = req.body.fileType;
-        if (!fileType || fileType !== 'json' || fileType !== 'PDF'
-            || fileType !== 'JSON' || fileType !== 'pdf') {
+        if (fileType !== undefined && fileType !== 'json' && fileType !== 'PDF'
+            && fileType !== 'JSON' && fileType !== 'pdf') {
             res.header('content-type', 'application/json');
-            return res.status(400).send("Invalid file type");
+            return res.status(400).send({error: "Invalid file type"});
         }
         next();
     } catch (error) {
         res.header('content-type', 'application/json');
-        return res.status(400).send("Bad request body");
+        return res.status(500).send("Internal Server Error");
     }
 }
 
@@ -49,7 +47,7 @@ export async function checkValidDates(req: Request, res: Response, next: NextFun
             const lDate: Date = new Date(lowerDate);
             if (isNaN(lDate.getTime())) {
                 res.header('content-type', 'application/json');
-                return res.status(400).send("Invalid dates");
+                return res.status(400).send({error: "Invalid dates"});
             }
         }
 
@@ -57,14 +55,14 @@ export async function checkValidDates(req: Request, res: Response, next: NextFun
             const uDate: Date = new Date(upperDate);
             if (isNaN(uDate.getTime())) {
                 res.header('content-type', 'application/json');
-                return res.status(400).send("Invalid dates");
+                return res.status(400).send({error: "Invalid dates"});
             }
         }
         next();
     }
     catch (error) {
         res.header('content-type', 'application/json');
-        return res.status(400).send("Bad request body");
+        return res.status(500).send("Internal Server Error");
     }
 
 }
@@ -82,14 +80,15 @@ export async function checkValidDates(req: Request, res: Response, next: NextFun
 export function checkLeaderboardFileType(req: Request, res: Response, next: NextFunction) {
     try {
         const fileType = req.body.fileType;
-        if (!fileType || fileType !== 'json' || fileType !== 'PDF'
-            || fileType !== 'JSON' || fileType !== 'pdf'
-            || fileType !== 'csv' || fileType !== 'CSV') {
-            return res.status(400).send("Invalid file type");
+        if (fileType !== undefined && fileType !== 'json' && fileType !== 'PDF'
+            && fileType !== 'JSON' && fileType !== 'pdf'
+            && fileType !== 'csv' && fileType !== 'CSV') {
+            res.header('content-type', 'application/json');
+            return res.status(400).send({ error: "Invalid file type" });
         }
         next();
     } catch (error) {
-        return res.status(400).send("Bad request body");
+        return res.status(500).send("Internal Server Error");
     }
 }
 
@@ -108,13 +107,15 @@ export function checkLeaderboardFilters(req: Request, res: Response, next: NextF
         const { filter } = req.body;
         if (filter !== undefined) {
             if (filter !== 'ascending' && filter !== 'descending') {
-                return res.status(400).send("Invalid filter");
+                res.header('content-type', 'application/json');
+                return res.status(400).send({ error: "Invalid filter" });
             }
         }
         next();
     }
     catch (error) {
-        return res.status(400).send("Bad request body");
+        console.log(error);
+        return res.status(500).send("Internal Server Error");
     }
 
 }
@@ -145,7 +146,7 @@ export async function checkRecharge(req: Request, res: Response, next: NextFunct
     catch (error) {
         console.error(error);
         res.header('content-type', 'application/json');
-        return res.status(400).json("Bad request body");
+        return res.status(500).json("Internal Server Error");
     }
 }
 
@@ -155,18 +156,17 @@ export async function checkRecharge(req: Request, res: Response, next: NextFunct
 **/
 export async function checkCreditsExists(req: Request, res: Response, next: NextFunction) {
     try {
-        const recipient: string = req.body.recipient;
-        if (!getUserCredits(recipient)) {
+        const user: string = req.body.user.email;
+        if (!getUserCredits(user)) {
             res.header('content-type', 'application/json')
             const error = new GetCreditsError().getResponse();
-            res.status(error.status).json({ error: error.message });
+            return res.status(error.status).json({ error: error.message });
         } else {
             next();
         }
-
     } catch (error) {
         console.error(error);
         res.header('content-type', 'application/json')
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 }

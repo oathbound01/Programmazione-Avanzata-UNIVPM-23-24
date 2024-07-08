@@ -63,7 +63,7 @@ export async function newGame(req: Request, res: Response): Promise<void> {
             // Updates the inGame status of the players and charges the user for the game.
 
             updatePlayerInGameStatus(playerOne, true);
-            if (req.body.gameOpponent != 'AI') {
+            if (req.body.gameOpponent !== 'AI') {
                 updatePlayerInGameStatus(req.body.gameOpponent, true);
                 chargeUser(PVP_GAME_COST, playerOne);
             } else {
@@ -133,6 +133,7 @@ export async function updatePlayerInGameStatus(player: any, status: boolean): Pr
 
 export async function makeMove(req: Request, res: Response): Promise<void> {
     try {
+        console.log('aaaaaaaaaaaaaaaa')
         const id: number = req.body.gameId;
         // Typescript doesn't like multidimensional array indexing.
         const move: any = req.body.move;
@@ -202,7 +203,7 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
 
             // Turn checks and inGame checks
 
-            if (newStatus != 'FINISHED') {
+            if (newStatus != 'FINISHED' && game.player2 != 'AI') {
                 var newTurn = game.currentTurn == game.player1 ? game.player2 : game.player1;
             } else {
                 var newTurn = game.currentTurn;
@@ -223,7 +224,7 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
 
                 const success = new successHandler.MoveSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
-                res.status(success.status).json({ Message: success.message, gameState: newGameState });
+                res.status(success.status).json({ Message: success.message, winner: newWinner, status: newStatus, gameState: newGameState});
             });
         });
     } catch (error) {

@@ -15,7 +15,7 @@ import {
     GameModeError,
     TimeBadRequest,
     CreateGameError,
-    NotYourTurnError
+    NotYourTurnError,
 } from "../messages/errorMessages";
 import { quitGame } from '../controller/gameMaster';
 
@@ -24,8 +24,9 @@ import { quitGame } from '../controller/gameMaster';
 // Validate game creation
 export async function validateGameCreation(req: Request, res: Response, next: NextFunction) {
     try {
-        const { playerOne, gameOpponent, turnTime, gameMode } = req.body;
-        if (!gameMode || !playerOne || !gameOpponent || turnTime === undefined) {
+        const { gameOpponent, turnTime, gameMode } = req.body;
+        const playerOne = req.body.user.email;
+        if (!gameMode || !gameOpponent || turnTime === undefined) {
             const errorResponse = new NoContent().getResponse();
             res.header('Content-Type', 'application/json');
             return res.status(errorResponse.status).json({ error: errorResponse.message });
@@ -227,12 +228,12 @@ export async function checkUserCredits(req: Request, res: Response, next: NextFu
     let opponent = req.body.gameOpponent;
         // Check if the user has enough credits to perform the operation
         if (opponent == 'AI' && credits < 0.75) {
-            const errorResponse = new PlayedGameError().getResponse();
+            const errorResponse = new CreditsError().getResponse();
             res.header('Content-Type', 'application/json');
             return res.status(errorResponse.status).json({ error: errorResponse.message });
         }
         if (opponent != 'AI' && credits < 0.45) {
-            const errorResponse = new PlayedGameError().getResponse();
+            const errorResponse = new CreditsError().getResponse();
             res.header('Content-Type', 'application/json');
             return res.status(errorResponse.status).json({ error: errorResponse.message });
         }

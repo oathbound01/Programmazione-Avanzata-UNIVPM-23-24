@@ -14,17 +14,14 @@ import { SuccessMessageEnum } from "../messages/message";
  * @returns Nothing
  */
 
-export async function chargeUser(amount: number, user: string): Promise<void> {
+export async function chargeUser(amount: number, userID: string): Promise<void> {
     try {
-        await User.findByPk(user).then((user: any) => {
+        await User.findByPk(userID).then((user: any) => {
             if (user.credits >= amount) {
-                User.update({
-                    credit: Sequelize.literal(`credit - ${amount}`)
-                }, {
-                    where: {
-                        email: user
-                    }
+                user.update({
+                    credits: Sequelize.literal(`credits - ${amount}`)
                 });
+                console.log(userID + " has been charged " + amount + " credits.");
             }
         });
     } catch (error) {
@@ -68,7 +65,7 @@ export async function giveCredits(req: Request, res: Response): Promise<void> {
  * @returns The user's credits.
  */
 export async function getCredits(req: Request, res: Response): Promise<void> {
-    const userEmail = req.body.email; // Accessing the email from the request body
+    const userEmail = req.body.user.email; // Accessing the email from the request body
 
     try {
         const credits = await getUserCredits(userEmail);

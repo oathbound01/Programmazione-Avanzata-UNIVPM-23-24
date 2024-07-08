@@ -150,7 +150,7 @@ export class CreditsError implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.PAYMENT_REQUIRED,
-            message: "Insufficient credit to create a game",
+            message: "Insufficient credits to create a game",
         };
     }
 }
@@ -168,7 +168,7 @@ export class ChargeCreditsError implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.INTERNAL_SERVER_ERROR,
-            message: "Failed to charge token",
+            message: "Failed to charge credits",
         };
     }
 }
@@ -267,7 +267,7 @@ export class ChargeCreditsBadRequest implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.BAD_REQUEST,
-            message: "Invalid token charge request",
+            message: "Invalid credits charge request",
         };
     }
 }
