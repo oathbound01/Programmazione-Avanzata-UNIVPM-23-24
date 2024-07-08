@@ -1,5 +1,5 @@
 import e, { Request, Response, NextFunction } from 'express';
-import { User, getUserCredits, getUserID } from "../models/userModel";
+import { User, getUserCredits } from "../models/userModel";
 import { CreditsError, GetCreditsError } from "../messages/errorMessages";
 import { DECIMAL } from 'sequelize';
 import { type } from 'os';

@@ -22,7 +22,7 @@ export const GameTTT = sequelize.define('games', {
         gameMode: {type: DataTypes.STRING, allowNull: false},
         status: {type: DataTypes.STRING, allowNull: false},
         gameState: {type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false},
-        winner: {type: DataTypes.STRING, defaultValue: "The game is not finished"},
+        winner: {type: DataTypes.STRING, defaultValue: "TBD"},
     },
     {
         modelName: 'games',

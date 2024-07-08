@@ -49,7 +49,7 @@ export class NoBody implements Message {
 export class NoContent implements Message {
     getResponse(): Response {
         return {
-            status: HttpStatusCode.NO_CONTENT,
+            status: HttpStatusCode.BAD_REQUEST,
             message: "Missing required fields",
         };
     }
@@ -83,11 +83,11 @@ export class MoveError implements Message {
     }
 }
 
-export class TimeLimit implements Message {
+export class TimeOut implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.REQUEST_TIMEOUT,
-            message: "Invalid time limit",
+            message: "Move timed out. Game forfeited",
         };
     }
 }

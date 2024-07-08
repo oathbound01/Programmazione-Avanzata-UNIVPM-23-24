@@ -16,6 +16,7 @@ import * as csv from 'csv-stringify/sync';
 import * as successHandler from '../messages/successMessage';
 import { HttpStatusCode } from '../messages/message';
 import { chargeUser } from './creditManagement';
+import { checkMoveTime } from '../middleware/gameMiddleware';
 
 
 const connection: Sequelize = DBAccess.getInstance();
@@ -89,7 +90,7 @@ export async function newGame(req: Request, res: Response): Promise<void> {
 
 export async function getGame(req: Request, res: Response): Promise<void> {
     try {
-        const id = req.body.id;
+        const id = req.body.gameId;
         await GameTTT.findOne({
             attributes: ['status', 'player1', 'player2', 'currentTurn', 'gameState', 'winner'],
             where: { gameId: id }
@@ -132,7 +133,7 @@ export async function updatePlayerInGameStatus(player: any, status: boolean): Pr
 
 export async function makeMove(req: Request, res: Response): Promise<void> {
     try {
-        const id: number = req.body.id;
+        const id: number = req.body.gameId;
         // Typescript doesn't like multidimensional array indexing.
         const move: any = req.body.move;
         const player: string = req.body.user.email;
@@ -239,21 +240,28 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
  * @param res 
  */
 
-export async function quitGame(req: Request, res: Response): Promise<void> {
+export async function quitGame(req: Request, res: Response, timeOut?: boolean): Promise<void> {
     try {
         await GameTTT.findOne({
             attributes: ['player1', 'player2', 'status', 'currentTurn'],
-            where: { gameId: req.body.id }
+            where: { gameId: req.body.gameId }
         }).then((game: any) => {
             var newStatus = 'FORFEIT';
             var newWinner = req.body.user.email == game.player1 ? game.player2 : game.player1;
             GameTTT.update({
                 status: newStatus,
                 winner: newWinner
-            }, { where: { gameId: req.body.id } }).then(() => {
+            }, { where: { gameId: req.body.gameId } }).then(() => {
+                // Updates the inGame status of the players
+                updatePlayerInGameStatus(game.player1, false);
+                if (game.player2 != 'AI') {
+                    updatePlayerInGameStatus(game.player2, false);
+                }
+                if (!timeOut) {
                 const success = new successHandler.QuitGameSuccess().getResponse();
                 res.header('Content-Type', 'application/json');
                 res.status(success.status).json({ Message: success.message });
+                }
             });
         });
 
