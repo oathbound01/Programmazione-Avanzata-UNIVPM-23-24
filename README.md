@@ -43,7 +43,7 @@ We implement a system to manage the game of Tic Tac Toe. In particular, the syst
 ![Diagramma dei casi d'uso - AddCredit](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/81b62654-27e8-4b59-a589-5fa44f8cb2ec)
 
 
-## Routes:
+## 🧭 Routes:
 | Route          | Method | Description                       | Authentication jwt |
 |----------------|--------|-----------------------------------|--------------------|
 | \newGame       | POST   | Initiate a new game               |        Yes         |
@@ -56,7 +56,13 @@ We implement a system to manage the game of Tic Tac Toe. In particular, the syst
 | \recharge      | POST   | Recharge user credits             |        Yes         | 
 
 
-## Patterns used
+## 🧮 Patterns used
+
+## 🔧 How to use
+
+## 💻 Tests
+
+## 	👥 Contributors
 
 
 
