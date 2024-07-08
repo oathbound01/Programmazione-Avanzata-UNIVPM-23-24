@@ -45,15 +45,6 @@ export class LeaderboardSuccess implements Message {
     }
 }
 
-export class GetTokenSuccess implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.OK,
-            message: "Token successfully retrieved",
-        };
-    }
-}
-
 export class GetCreditsSuccess implements Message {
     getResponse(): Response {
         return {
@@ -73,29 +64,11 @@ export class RechargeSuccess implements Message {
     }
 }
 
-export class EndGameSuccessClose implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.OK,
-            message: "Game successfully ended",
-        };
-    }
-}
-
 export class QuitGameSuccess implements Message {
     getResponse(): Response {
         return {
             status: HttpStatusCode.OK,
             message: "Game successfully quit",
-        };
-    }
-}
-
-export class DefaultSuccess implements Message {
-    getResponse(): Response {
-        return {
-            status: HttpStatusCode.OK,
-            message: "Operation successful",
         };
     }
 }
