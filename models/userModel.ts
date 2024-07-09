@@ -18,7 +18,6 @@ export const User = sequelize.define('users', {
 {
     modelName: 'users',
     timestamps: false,
-    //freezeTableName: true
 });
 
 export async function getUserCredits(userEmail: string) {
@@ -31,16 +30,3 @@ export async function getUserCredits(userEmail: string) {
         return null;
     }
 }
-
-/** 
- * 
- *  @deprecated 
- * 
-export async function getUserByID(email:string) {
-    try{
-        let result = await User.findByPk(email);
-    }catch{
-        console.log("Database Server Error")
-    }
-};
-*/

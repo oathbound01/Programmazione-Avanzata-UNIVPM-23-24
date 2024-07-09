@@ -16,13 +16,10 @@ import * as csv from 'csv-stringify/sync';
 import * as successHandler from '../messages/successMessage';
 import { HttpStatusCode } from '../messages/message';
 import { chargeUser } from './creditManagement';
-import { checkMoveTime } from '../middleware/gameMiddleware';
-
 
 const connection: Sequelize = DBAccess.getInstance();
 
 // Credit costs
-
 const AI_GAME_COST = 0.75;
 const PVP_GAME_COST = 0.45;
 const MOVE_COST = 0.05;
@@ -34,7 +31,6 @@ const MOVE_COST = 0.05;
  * @param req 
  * @param res 
  */
-
 export async function newGame(req: Request, res: Response): Promise<void> {
     // gameState may vary depending on the game mode.
 
@@ -61,7 +57,6 @@ export async function newGame(req: Request, res: Response): Promise<void> {
         }).then((game: any) => {
 
             // Updates the inGame status of the players and charges the user for the game.
-
             updatePlayerInGameStatus(playerOne, true);
             if (req.body.gameOpponent !== 'AI') {
                 updatePlayerInGameStatus(req.body.gameOpponent, true);
@@ -72,7 +67,7 @@ export async function newGame(req: Request, res: Response): Promise<void> {
 
             const success = new successHandler.CreateGameSuccess().getResponse();
             res.header('Content-Type', 'application/json');
-            res.status(success.status).json({ Message: success.message, ID: game.gameId });
+            res.status(success.status).json({ Message: success.message, gameId: game.gameId });
         });
     } catch (error) {
         console.log(error);
@@ -87,10 +82,9 @@ export async function newGame(req: Request, res: Response): Promise<void> {
  * @param req 
  * @param res 
  */
-
 export async function getGame(req: Request, res: Response): Promise<void> {
     try {
-        const id = req.body.gameId;
+        const id = req.params.gameId;
         await GameTTT.findOne({
             attributes: ['status', 'player1', 'player2', 'currentTurn', 'gameState', 'winner'],
             where: { gameId: id }
@@ -113,7 +107,6 @@ export async function getGame(req: Request, res: Response): Promise<void> {
  * @param player the player to update
  * @param status "true" or "false", depending on the desired status.
  */
-
 export async function updatePlayerInGameStatus(player: any, status: boolean): Promise<void> {
     try {
         await User.update({ inGame: status }, { where: { email: player } });
@@ -130,11 +123,9 @@ export async function updatePlayerInGameStatus(player: any, status: boolean): Pr
  * @param req 
  * @param res 
  */
-
 export async function makeMove(req: Request, res: Response): Promise<void> {
     try {
-        console.log('aaaaaaaaaaaaaaaa')
-        const id: number = req.body.gameId;
+        const id: number = Number(req.params.gameId);
         // Typescript doesn't like multidimensional array indexing.
         const move: any = req.body.move;
         const player: string = req.body.user.email;
@@ -162,8 +153,8 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
                     newGameState[move] = 'O';
                 }
             }
+            
             // Necessary formatting to save the move
-
             if (typeof move === 'number') {
                 var moveArray: number[] = [move]
             } else {
@@ -173,7 +164,6 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
             saveMove(game.gameId, game.gameMode, player, moveArray);
 
             // Victory check, draw check and AI move
-
             if (game.gameMode == '3D') {
                 if (hasWon3D(newGameState)) {
                     var newWinner: string = player;
@@ -202,7 +192,6 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
             }
 
             // Turn checks and inGame checks
-
             if (newStatus != 'FINISHED' && game.player2 != 'AI') {
                 var newTurn = game.currentTurn == game.player1 ? game.player2 : game.player1;
             } else {
@@ -240,7 +229,6 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
  * @param req 
  * @param res 
  */
-
 export async function quitGame(req: Request, res: Response, timeOut?: boolean): Promise<void> {
     try {
         await GameTTT.findOne({
@@ -253,6 +241,7 @@ export async function quitGame(req: Request, res: Response, timeOut?: boolean): 
                 status: newStatus,
                 winner: newWinner
             }, { where: { gameId: req.body.gameId } }).then(() => {
+                
                 // Updates the inGame status of the players
                 updatePlayerInGameStatus(game.player1, false);
                 if (game.player2 != 'AI') {
@@ -265,8 +254,6 @@ export async function quitGame(req: Request, res: Response, timeOut?: boolean): 
                 }
             });
         });
-
-
     } catch (error) {
         console.log(error);
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
@@ -282,7 +269,6 @@ export async function quitGame(req: Request, res: Response, timeOut?: boolean): 
  * @param player The player that made the move
  * @param move The move made by the player (saved as an array of integers)
  */
-
 async function saveMove(gameId: number, gameType: string, player: string, move: Array<number>): Promise<void> {
     try {
         await Moves.create({
@@ -305,7 +291,6 @@ async function saveMove(gameId: number, gameType: string, player: string, move: 
  * @param req 
  * @param res 
  */
-
 export async function getMoveHistory(req: Request, res: Response): Promise<void> {
     try {
         const { Op } = require('sequelize');
@@ -313,7 +298,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
 
         // Sets up filter types.
         // Default filter is only the player's id
-
         type FilterType = {
             player: string,
             gameType?: string | null,
@@ -346,7 +330,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
         }).then((moves: any) => {
 
             // Output manipulation. Defaults to JSON.
-
             let output = moves.map((move: any) => move.toJSON());
 
             if (req.body.fileType === 'PDF' || req.body.fileType === 'pdf') {
@@ -362,7 +345,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
                 res.status(success.status).json({ Message: success.message, MoveHistory: output });
             };
         });
-
     } catch (error) {
         console.log(error);
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error")
@@ -376,7 +358,6 @@ export async function getMoveHistory(req: Request, res: Response): Promise<void>
  * @param req 
  * @param res 
  */
-
 export async function getLeaderboard(req: Request, res: Response): Promise<void> {
     try {
 
@@ -480,7 +461,6 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
         }
 
         // Filters
-
         if (req.body.filter === 'ascending') {
             lb = Object.fromEntries(Object.entries(lb).sort(
                 (a: any, b: any) => a[1].wins - b[1].wins));
@@ -490,7 +470,6 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
         }
 
         // Output manipulation. Defaults to JSON.
-
         if (req.body.fileType === 'pdf' || req.body.fileType === 'PDF') {
             res.header('Content-Type', 'application/pdf');
 
@@ -502,7 +481,6 @@ export async function getLeaderboard(req: Request, res: Response): Promise<void>
         } else if (req.body.fileType === 'CSV' || req.body.fileType === 'csv') {
 
             // This function is the hackiest thing I've ever wrote, I hate csv.
-
             let headers: string[] = ['User', 'Wins', 'Losses', 'Forfeit Wins', 'Forfeit Losses', 'Wins against AI', 'Losses against AI'];
             let values: any[] = Object.values(Object.values(lb));
             let emails = Object.keys(lb);

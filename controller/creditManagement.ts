@@ -1,9 +1,7 @@
 import { Sequelize } from "sequelize";
 import { User, getUserCredits } from "../models/userModel";
-import e, { Request, Response } from "express";
-import { RechargeSuccess, GetCreditsSuccess } from "../messages/successMessage";
-import { GetCreditsError } from "../messages/errorMessages";
-import { SuccessMessageEnum } from "../messages/message";
+import { Request, Response } from "express";
+import { RechargeSuccess } from "../messages/successMessage";
 
 /**
  * 
@@ -13,7 +11,6 @@ import { SuccessMessageEnum } from "../messages/message";
  * @param user The user to have their credits charged.
  * @returns Nothing
  */
-
 export async function chargeUser(amount: number, userID: string): Promise<void> {
     try {
         await User.findByPk(userID).then((user: any) => {
@@ -37,7 +34,6 @@ export async function chargeUser(amount: number, userID: string): Promise<void> 
  * @param user The user to have their credits recharged.
  * @returns
  */
-
 export async function giveCredits(req: Request, res: Response): Promise<void> {
     try {
         const amount: number = req.body.amount;
@@ -69,7 +65,6 @@ export async function getCredits(req: Request, res: Response): Promise<void> {
 
     try {
         const credits = await getUserCredits(userEmail);
-
         if (credits !== null) {
             res.status(200).json({ credits: credits });
         } else {

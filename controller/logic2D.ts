@@ -4,7 +4,6 @@
  * 
  * 
  */
-
 export const board2D:string[]  = [ '', '', '',
                                         '', '', '',
                                         '', '', ''];
@@ -16,8 +15,6 @@ export const board2D:string[]  = [ '', '', '',
  * @param gameState The current game state
  * @returns true if the game has been won, false otherwise.
  */
-
-
 export function hasWon(gameState:string[]): boolean {
     // Row check
     for (let i = 0; i < 9; i += 3) {

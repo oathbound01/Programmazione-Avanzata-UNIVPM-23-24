@@ -5,7 +5,6 @@
  * The 3D board is a 4x4x4 matrix.
  * 
  */
-
 export const board3D: string[][] = [
     ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
     ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
@@ -19,7 +18,6 @@ export const board3D: string[][] = [
  * @param gameState The current game state
  * @returns true if the game has been won, false otherwise.
  */
-
 export function hasWon3D(gameState: string[][]): boolean {
     const size = 4;
 
@@ -126,7 +124,6 @@ export function hasWon3D(gameState: string[][]): boolean {
     if (allEqual(mainDiagonal4)) {
         return true;
     }
-
     return false;
 }
 
