@@ -203,7 +203,30 @@ This route creates a new game.
 A successful response returns the ID of the newly-created game.
 
 ### **<mark>/game/<gameId></mark>**
-In this route, we pass the `gameId` parameter in the URL.
+In this route, we pass the `gameId` parameter in the URL. The result is:
+```
+{
+    "Message": "Game status successfully retrieved",
+    "GameStatus": {
+        "status": "IN PROGRESS",
+        "player1": "user2@example.com",
+        "player2": "AI",
+        "currentTurn": "user2@example.com",
+        "gameState": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "winner": "TBD"
+    }
+}
+```
 
 ### **<mark>/move/:gameId:</mark>**
 This is the route used to make a move in the Tic-Tac-Toe game board of game with id `gameId`.
@@ -219,20 +242,20 @@ The response contains the current game state.
 
 ```
 {
-    "Messages": "Move successfully executed",
-    "winner": "TDB",
+    "Message": "Move successfully executed",
+    "winner": "TBD",
     "status": "IN PROGRESS",
     "gameState": [
         "X",
         "",
         "",
         "",
-        "0",
+        "O",
         "",
         "",
         "",
         ""
-
+    ]
 }
 ```
 
@@ -248,9 +271,30 @@ Return the move history for the current user. Can include optional filters in th
     "upperDate": "2024-10-10"
 }
 ```
+The result is something like this:
+```
+{
+    "Message": "History of moves successfully retrieved",
+    "MoveHistory": [
+        {
+            "moveId": 4,
+            "gameId": 2,
+            "player": "user2@example.com",
+            "move": [
+                4,
+                2
+            ],
+            "gameType": "3D",
+            "moveDate": "2024-07-09T15:42:55.428Z",
+            "createdAt": "2024-07-09T15:42:55.428Z",
+            "updatedAt": "2024-07-09T15:42:55.428Z"
+        }
+    ]
+}
+```
 
        
- ### **<mark>/quit/:gameId:</mark>**
+### **<mark>/quit/:gameId:</mark>**
 Quits the game specified in `gameId`.
 The user can't quit games that they aren't a part of or that are already over.
 Awards a victory by forfeit to the other player.
@@ -271,6 +315,12 @@ Can include optional parameters in the body:
 }
 ```
 `fileType`: desired output format. Can be `PDF`, `pdf`, `csv`, `json`, `JSON`, `json`. Defaults to JSON. 
+And the result is:
+```
+User,Wins,Losses,Forfeit Wins,Forfeit Losses,Wins against AI,Losses against AI
+user1@example.com,1,1,0,0,1,0
+user2@example.com,0,2,0,0,0,1
+```
  
  ### **<mark>/credits</mark>**
 Returns the current user's credits.
