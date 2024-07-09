@@ -95,6 +95,10 @@ export function checkAdmin(req: any, res: any, next: any): void {
 export function checkUserExists(req: any, res: any, next: any): void {
     try {
         const user = req.body.user;
+        if (typeof user.email !== 'string') {
+            const error = new MissingTokenParams().getResponse();
+            return res.status(error.status).json({ error: error.message });
+        }
         User.findByPk(user.email).then((result) => {
             if (!result) {
                 res.header('content-type', 'application/json')
@@ -124,6 +128,10 @@ export function checkOpponentExists(req: any, res: any, next: any): void {
         const opponent = req.body.gameOpponent;
         if (opponent === 'AI') {
             return next();
+        }
+        if (typeof req.body.gameOpponent !== 'string') {
+            const error = new UserNotFound().getResponse();
+            return res.status(error.status).json({ error: error.message, opponent: opponent});
         }
         User.findByPk(opponent).then((result) => {
             if (!result) {
