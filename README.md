@@ -53,8 +53,8 @@ The sostware has a leaderboard system that orders players by games won, includin
 ### UML Use-case diagrams
 ![Diagramma dei casi d'uso - Diagramma dei casi d'uso](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/47cec9b6-edf2-4a0f-806d-ee84192a2c38)
 
-### Route: \newGame
-The route **<mark>\createGame</mark>** is used to create a new gam. The user must provide some specific information about the game, such as the opponent or the game mode. The type of match can be chosen between user versus user, which can be in a simple version or a 3D version, or user versus AI. In the case of a user versus user match, it is necessary to specify the e-mail of the opponent.
+### Route: /newGame 
+The route **<mark>/newGame</mark>** is used to create a new gam. The user must provide some specific information about the game, such as the opponent or the game mode. The type of match can be chosen between user versus user, which can be in a simple version or a 3D version, or user versus AI. In the case of a user versus user match, it is necessary to specify the e-mail of the opponent.
 
 In addition, a maximum time to make a move can be set; if the time expires, the match is declared over. There is also an option to impose no time limit for moves.
 
@@ -62,13 +62,13 @@ Each match incurs a cost in terms of tokens. For creating a user versus user mat
 
 ![Diagramma dei casi d'uso - NewGame](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/690451fa-ab84-4ab5-8023-42ebc9d312c2)
 
-### Route: \getGame
-The oute **<mark>\getGame</mark>** is used to obtain detailed information about a given game. When a user sends a request to this route, the current status of the game is returned, including whose turn it is currently, whether the game has ended, and, if so, who is the winner. The response also provides additional pertinent details, such as the current game state (the game board) and any relevant information that may affect the progress of the game.
+### Route: /game/:gameId
+The oute **<mark>/game/:gameId</mark>** is used to obtain detailed information about a given game. When a user sends a request to this route, the current status of the game is returned, including whose turn it is currently, whether the game has ended, and, if so, who is the winner. The response also provides additional pertinent details, such as the current game state (the game board) and any relevant information that may affect the progress of the game.
 
 ![Diagramma dei casi d'uso - GameStatus](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/4f720390-cbf7-400f-a050-3ab03f8a7a2d)
 
-### Route: \makeMove
-The route **<mark>\makeMove</mark>** is used to make a move in a given game. When a player sends a request to make a move, the system first checks whether it is the turn of the player who sent the request. If it is not his turn, the move is rejected and the player is notified that he must wait for his turn.
+### Route: /move/:gameId
+The route **<mark>/move/:gameId</mark>** is used to make a move in a given game. When a player sends a request to make a move, the system first checks whether it is the turn of the player who sent the request. If it is not his turn, the move is rejected and the player is notified that he must wait for his turn.
 
 Next, the system checks whether the proposed move is valid according to the rules of the game. For example, in a game of tic-tac-toe, this means checking that the chosen square is vacant and not occupied by another mark. If the move is eligible, it is recorded in the system and the turn passes to the other player. In addition, the system updates the status of the game and checks whether the move resulted in a victory for one of the players, or whether the game ended in a draw.
 
@@ -76,23 +76,23 @@ In case the move is not valid, the system rejects the request and provides an ex
 
 ![Diagramma dei casi d'uso - MakeMove](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/ec02ce81-6f1c-4a09-add3-fdc7bb189744)
 
-### Route: \getMoves
-The route **<mark>\getMove</mark>** is used to obtain the move history and allows users to view all the moves made in past games, providing options to customize the output format and search criteria.
+### Route: /history 
+The route **<mark>/history </mark>** is used to obtain the move history and allows users to view all the moves made in past games, providing options to customize the output format and search criteria.
 
 When a user invokes this route, they can specify the desired output format, which can be PDF or JSON.
 In addition, the user can filter the moves according to the desired time period. A lower and upper date can be specified to define a time range.
 
 ![Diagramma dei casi d'uso - MoveHistory](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/28b5c69e-6a10-4d46-9e12-65b739b88622)
 
-### Route: \quitGame
-The **<mark>\quitGame</mark>** route is for quitting a game currently in progress. When a player decides to abandon a game, they send a request to this specific route.
+### Route: /quit/:gameId 
+The **<mark>/quit/:gameId </mark>** route is for quitting a game currently in progress. When a player decides to abandon a game, they send a request to this specific route.
 
 The system first verifies the identity of the player to ensure that the request actually comes from one of the participants of the game. Once the identity is confirmed, the system acknoledges the action and updates the status of the game, indicating that it has been forfeited. The remaining player is then declared as the winner.
 
 ![Diagramma dei casi d'uso - QuitGame](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/2a0bf80f-93a6-4a32-917b-caed46017442)
 
-### Route: \leaderboard
-To implement the **<mark>\leaderboard</mark>** route, which returns player rankings without requiring authentication, the system needs to collect and aggregate several pieces of information related to games played. The ranking includes the total number of games won, both regularly and by opponent abandonment, and the number of games lost, also divided into regular and opponent abandonment losses. This data is categorized according to whether the games were played against other users or against artificial intelligence (AI).
+### Route: /leaderboard
+To implement the **<mark>/leaderboard</mark>** route, which returns player rankings without requiring authentication, the system needs to collect and aggregate several pieces of information related to games played. The ranking includes the total number of games won, both regularly and by opponent abandonment, and the number of games lost, also divided into regular and opponent abandonment losses. This data is categorized according to whether the games were played against other users or against artificial intelligence (AI).
 
 Each player's score is calculated by considering all games won, including those by opponent abandonment. This score is the main metric for ranking players.
 
@@ -100,13 +100,13 @@ When a user accesses the ranking route, they can choose to sort the results in a
 
 ![Diagramma dei casi d'uso - Leaderboard (1)](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/44dbe94d-e84d-4d82-920e-83e8641a5ca2)
 
-### Route: \getCredits
-The route **<mark>\getCredits</mark>** allows users to view their credit balance within the system. When a user sends a request to this route, the system verifies the authenticity of the JWT token provided with the request. Once authentication is confirmed, the system retrieves and returns the current credit balance associated with the user who made the request.
+### Route: /credits 
+The route **<mark>/credits </mark>** allows users to view their credit balance within the system. When a user sends a request to this route, the system verifies the authenticity of the JWT token provided with the request. Once authentication is confirmed, the system retrieves and returns the current credit balance associated with the user who made the request.
 
 ![Diagramma dei casi d'uso - CheckCredit](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/15f9817e-8038-4751-b0f3-7f136e880de3)
 
-### Route: \recharge
-The **<mark>\recharge</mark>** route is designed to allow administrators to recharge the credit of a specific user within the system. Access to this route is protected by authentication using JWT, ensuring that only authorized administrators can perform this critical operation.
+### Route: /recharge
+The **<mark>/recharge</mark>** route is designed to allow administrators to recharge the credit of a specific user within the system. Access to this route is protected by authentication using JWT, ensuring that only authorized administrators can perform this critical operation.
 
 An admin can send a request including the target user's e-mail address and the amount of credit to be added. The system checks the validity of the JWT token to confirm that the administrator has the necessary privileges to perform this action.
 
@@ -118,14 +118,14 @@ Once the authenticity of the request is confirmed, the system proceeds to update
 ## 🧭 Routes:
 | Route          | Method | Description                       | Authentication jwt |
 |----------------|--------|-----------------------------------|--------------------|
-| \newGame       | POST   | Initiate a new game               |        Yes         |
-| \getGame       | GET    | Retrieve the current game state   |        Yes         |
-| \makeMove      | POST   | Make a move in the game           |        Yes         |
-| \getMoves      | GET    | Get all moves by the user         |        Yes         |
-| \quitGame      | POST   | Quit a game                       |        Yes         |
-| \leaderboard   | GET    | Get the leaderboard               |        No          |
-| \getCredits    | Get    | Get user credits                  |        Yes         | 
-| \recharge      | POST   | Recharge a user's credits         |        Yes         | 
+| /newGame       | POST   | Initiate a new game               |        Yes         |
+| /game/:gameId  | GET    | Retrieve the current game state   |        Yes         |
+| /move/:gameId  | POST   | Make a move in the game           |        Yes         |
+| /history       | GET    | Get all moves by the user         |        Yes         |
+| /quit/:gameId  | POST   | Quit a game                       |        Yes         |
+| /leaderboard   | GET    | Get the leaderboard               |        No          |
+| /credits       | Get    | Get user credits                  |        Yes         | 
+| /recharge      | POST   | Recharge a user's credits         |        Yes         | 
 
 
 ## 🧮 Patterns used
@@ -177,12 +177,134 @@ docker-compose up
 ```
 Once everything is set up and running, you can proceed to make requests using [Postman](https://www.postman.com/).
 
-## 💻 Demo
-bla bla bla
-![image](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/e4459575-83b7-44a4-9642-5276734e001d)
+## 💻 Test
+In all routes that require authorization, the payload should include:
+```
+{
+  "email": "user2@example.com",
+  "role": "admin",
+  "iat": 1516239022
+}
+```
+After that we can pass to test all the routes.
 
-bla bla bla
-![image (1)](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/d68bfe38-3190-417b-9358-fa071a21cfd0)
+### **<mark>/newGame</mark>**
+In this route, we pass in the body:
+- 'gameOpponent': the player opponent;
+- 'gameMode': the type of the game that can be '2D' or '3D';
+- 'turnTime': is the timer of the turn.
+```
+{
+    "gameOpponent": "AI",
+    "gameMode": "2D",
+    "turnTime": 0
+}
+```
+
+The result of the this rout is the message that can be an error if there is an error or a success message if there isn't an error and the 'gameId' that is created.
+
+### **<mark>/game/:gameId</mark>**
+In this route, we pass the 'gameId' parameter in the URL.
+
+### **<mark>/move/:gameId</mark>**
+In this route, the 'gameId' is passed in the URL and the move to be made is passed in the body.
+```
+{
+    "move": "0",
+}
+
+```
+The result is the 'gameState' that show how is going the game.
+
+```
+{
+    "Messages": "Move successfully executed",
+    "winner": "TDB",
+    "status": "IN PROGRESS",
+    "gameState": [
+        "X",
+        "",
+        "",
+        "",
+        "0",
+        "",
+        "",
+        "",
+        ""
+
+}
+```
+
+### **<mark>/history</mark>**
+In this route, we pass in the body:
+- 'lowerDate': that rappresent the lower date of the move,
+- 'upperDate': that rappresent the upper date of the move.
+
+```
+{
+    "lowerDate": "2023-3-3",
+    "upperDate": "2024-10-10"
+}
+```
+
+       
+ ### **<mark>/quit/:gameId</mark>**
+In this route, we pass the 'gameId' in the URL to abandon the game and the result is a message that can be a success message, like the exemple or an error message.
+
+```
+{
+    "Messages": "Game successfully quit"
+}
+```
+ 
+ ### **<mark>/leaderboard</mark>**
+ In this route, we pass in the body:
+ 
+```
+{
+    "fileType": "csv"
+}
+```
+The file type can be 'csv' (like in the exemple) or pdf, or JSON.
+ 
+ ### **<mark>/credits</mark>**
+ In the route we have the user in the playload and it respond with the credits of the user.
+ 
+ ```
+{
+    "credits": 4.3
+}
+```
+
+ ### **<mark>/recharge</mark>**
+ In the rout, just if in the playlod the user has the role 'admin' can recharge the credits of the user, in the body we pass:
+ - 'amount': that is the amount of the credit that the admin want give to the user,
+ - 'recipient': the email of the user that that receive the recharge of the credits.
+
+```
+{
+    "amount": 1,
+    "recipient": "user1@example.com"
+}
+```
+The result is a message, that can be an error message if there is an error in the recharge or a success message like in the exemple:
+
+```
+{
+    "Messages": "Credits successfully recharged"
+}
+```
+
+
+
+### **<mark>/invalid</mark>**
+When in the URL we have ad 'invalid' name, it return an erre:
+```
+{
+    "error": "Route not found"
+}
+```
+  
 
 
 ## 	👥 Contributors
