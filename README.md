@@ -119,10 +119,10 @@ Once the authenticity of the request is confirmed, the system proceeds to update
 | Route          | Method | Description                       | JWT Authentication |
 |----------------|--------|-----------------------------------|--------------------|
 | /newGame       | POST   | Initiate a new game               |        Yes         |
-| /game/<gameId> | GET    | Retrieve the current game state   |        Yes         |
-| /move/<gameId> | POST   | Make a move in the game           |        Yes         |
+| /game/:gameId: | GET    | Retrieve the current game state   |        Yes         |
+| /move/:gameId: | POST   | Make a move in the game           |        Yes         |
 | /history       | GET    | Get all moves by the user         |        Yes         |
-| /quit/<gameId> | POST   | Quit a game                       |        Yes         |
+| /quit/:gameId: | POST   | Quit a game                       |        Yes         |
 | /leaderboard   | GET    | Get the leaderboard               |        No          |
 | /credits       | Get    | Get user credits                  |        Yes         | 
 | /recharge      | POST   | Recharge a user's credits         |        Yes         | 
@@ -203,9 +203,9 @@ This route creates a new game.
 A successful response returns the ID of the newly-created game.
 
 ### **<mark>/game/<gameId></mark>**
-In this route, we pass the 'gameId' parameter in the URL.
+In this route, we pass the `gameId` parameter in the URL.
 
-### **<mark>/move/:gameId</mark>**
+### **<mark>/move/:gameId:</mark>**
 This is the route used to make a move in the Tic-Tac-Toe game board of game with id `gameId`.
 It will ad an 'X' if the user is player one or an 'O' if it's player two.
 - `move`: the coordinates of the board space where to place the next move. 0-8 for 2D games, [0-3, 0,15] for 3D games;
@@ -240,7 +240,7 @@ The response contains the current game state.
 Return the move history for the current user. Can include optional filters in the request body.
 - `lowerDate`: retrieves all moves after this date. Format is `YYYY-MM-DD`;
 - `upperDate`: retrieves all moves after this date. Format is `YYYY-MM-DD`;
-- `fileType`: desired output format. Can be `PDF`,`pdf`,`JSON`,`json. Defaults to JSON.
+- `fileType`: desired output format. Can be `PDF`, `pdf`, `JSON`, `json`. Defaults to JSON.
 
 ```
 {
@@ -250,9 +250,9 @@ Return the move history for the current user. Can include optional filters in th
 ```
 
        
- ### **<mark>/quit/<gameId></mark>**
+ ### **<mark>/quit/:gameId:</mark>**
 Quits the game specified in `gameId`.
-Can't quit games that the user is not part of or that are already over.
+The user can't quit games that they aren't a part of or that are already over.
 Awards a victory by forfeit to the other player.
 
 ```
@@ -262,14 +262,15 @@ Awards a victory by forfeit to the other player.
 ```
  
  ### **<mark>/leaderboard</mark>**
- In this route, we pass in the body:
+Returns the current leaderboard with all users and their wins and losses.
+Can include optional parameters in the body:
  
 ```
 {
     "fileType": "csv"
 }
 ```
-The file type can be 'csv' (like in the exemple) or pdf, or JSON.
+`fileType`: desired output format. Can be `PDF`, `pdf`, `csv`, `json`, `JSON`, `json`. Defaults to JSON. 
  
  ### **<mark>/credits</mark>**
 Returns the current user's credits.
@@ -300,8 +301,6 @@ Returns a message if it succeeds.
 }
 ```
 
-
-
 ### **<mark>/invalid</mark>**
 When the user inputs an invalid route, they the following error message.
 ```
@@ -310,8 +309,6 @@ When the user inputs an invalid route, they the following error message.
 }
 ```
   
-
-
 ## 	👥 Contributors
 [Alessandro Rossini](https://github.com/oathbound01) (1119002)
 
