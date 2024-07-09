@@ -361,8 +361,10 @@ When the user inputs an invalid route, they the following error message.
   
 ## 	👥 Contributors
 [Alessandro Rossini](https://github.com/oathbound01) (1119002)
+Contributed to controllers (game logic), error messages, miscellanous and game validation middleware. 
 
 [Tosca Pierro](https://github.com/toscap2002) (1120542)
+Contributed to models, migrations, seeders, success messages and authentication validation middleware.
 
 
 
