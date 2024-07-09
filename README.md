@@ -116,13 +116,13 @@ Once the authenticity of the request is confirmed, the system proceeds to update
 
 
 ## 🧭 Routes:
-| Route          | Method | Description                       | Authentication jwt |
+| Route          | Method | Description                       | JWT Authentication |
 |----------------|--------|-----------------------------------|--------------------|
 | /newGame       | POST   | Initiate a new game               |        Yes         |
-| /game/:gameId  | GET    | Retrieve the current game state   |        Yes         |
-| /move/:gameId  | POST   | Make a move in the game           |        Yes         |
+| /game/<gameId> | GET    | Retrieve the current game state   |        Yes         |
+| /move/<gameId> | POST   | Make a move in the game           |        Yes         |
 | /history       | GET    | Get all moves by the user         |        Yes         |
-| /quit/:gameId  | POST   | Quit a game                       |        Yes         |
+| /quit/<gameId> | POST   | Quit a game                       |        Yes         |
 | /leaderboard   | GET    | Get the leaderboard               |        No          |
 | /credits       | Get    | Get user credits                  |        Yes         | 
 | /recharge      | POST   | Recharge a user's credits         |        Yes         | 
