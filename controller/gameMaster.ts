@@ -33,7 +33,6 @@ const MOVE_COST = 0.05;
  */
 export async function newGame(req: Request, res: Response): Promise<void> {
     // gameState may vary depending on the game mode.
-
     var gameState: string[] | string[][];
     const playerOne: string = req.body.user.email;
 
@@ -179,6 +178,7 @@ export async function makeMove(req: Request, res: Response): Promise<void> {
                 } else if (!hasWon(newGameState) && !(newGameState.indexOf('') == -1)) {
                     if (game.player2 == 'AI') {
                         let engineAI = require('tic-tac-toe-ai-engine');
+                        chargeUser(MOVE_COST, player);
                         var newGameState = engineAI.computeMove(newGameState).nextBestGameState;
                         if (hasWon(newGameState)) {
                             var newWinner = 'AI';

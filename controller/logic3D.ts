@@ -127,6 +127,12 @@ export function hasWon3D(gameState: string[][]): boolean {
     return false;
 }
 
+/**
+ * Checks if a 3D game state contains any empty cells.
+ * 
+ * @param {string[][]} gameState - A 3D representation of the game state, where each layer is a 2D string array.
+ * @returns {boolean} - True if there is at least one empty cell in the game state, false otherwise.
+ */
 export function hasEmptyCells3D(gameState: string[][]): boolean {
     for (let layer = 0; layer < gameState.length; layer++) {
         if (gameState[layer].indexOf("") !== -1) {

@@ -22,7 +22,6 @@ const MAX_CREDITS = 20;
  * @param next 
  * @returns 
  */
-
 export async function checkHistoryFileType(req: Request, res: Response, next: NextFunction) {
     try {
         const fileType = req.body.fileType;
@@ -47,7 +46,6 @@ export async function checkHistoryFileType(req: Request, res: Response, next: Ne
  * @param next 
  * @returns 
  */
-
 export async function checkValidDates(req: Request, res: Response, next: NextFunction) {
     try {
         const { lowerDate, upperDate } = req.body;
@@ -83,7 +81,6 @@ export async function checkValidDates(req: Request, res: Response, next: NextFun
  * @param next 
  * @returns 
  */
-
 export function checkLeaderboardFileType(req: Request, res: Response, next: NextFunction) {
     try {
         const fileType = req.body.fileType;
@@ -109,7 +106,6 @@ export function checkLeaderboardFileType(req: Request, res: Response, next: Next
  * @param next 
  * @returns 
  */
-
 export function checkLeaderboardFilters(req: Request, res: Response, next: NextFunction) {
     try {
         const { filter } = req.body;
@@ -128,6 +124,15 @@ export function checkLeaderboardFilters(req: Request, res: Response, next: NextF
 
 }
 
+/**
+ * 
+ *  Checks if a recharge operation is valid.
+ * 
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
 export async function checkRecharge(req: Request, res: Response, next: NextFunction) {
     try {
         const amount: number = req.body.amount;
