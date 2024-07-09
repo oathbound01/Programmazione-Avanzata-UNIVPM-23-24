@@ -1,0 +1,35 @@
+services:
+  node:
+    build: .
+    ports:
+      - "8080:3000"
+    container_name: backend
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/usr/app
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    container_name: pg-db
+    environment:
+     - POSTGRES_DB=${DB_NAME}
+     - POSTGRES_USER=${DB_USER}
+     - POSTGRES_PASSWORD=${DB_PASSWORD}
+     - PGPORT=${DB_PORT}
+    env_file:
+      - .env
+    ports:
+    - '${DB_PORT}:${DB_PORT}'
+    volumes:
+    - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: "exit 0"
+
+volumes:
+  pg_data:
