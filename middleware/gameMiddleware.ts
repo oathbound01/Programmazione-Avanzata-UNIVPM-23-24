@@ -68,7 +68,6 @@ export async function validateGameCreation(req: Request, res: Response, next: Ne
  * @param next 
  * @returns 
  */
-
 export async function validateMoveGame(req: Request, res: Response, next: NextFunction) {
     try {
         const { move, game } = req.body;
@@ -88,7 +87,6 @@ export async function validateMoveGame(req: Request, res: Response, next: NextFu
         }
 
         // Check if the move is within the game board
-
         if (gameMode === '2D' && (move < 0 || move > 8)) {
             const errorMessage = new OutOfBounds().getResponse();
             return res.status(errorMessage.status).json({ error: errorMessage.message });
@@ -98,13 +96,11 @@ export async function validateMoveGame(req: Request, res: Response, next: NextFu
         }
 
         // Check if the move is already taken
-
         if (gameMode === '2D' && game.getDataValue('gameState')[move] !== '') {
             return res.status(400).json({ error: 'That space is already taken' });
         } else if (gameMode === '3D' && game.getDataValue('gameState')[move[0]][move[1]] !== '') {
             return res.status(400).json({ error: 'That space is already taken' });
         }
-
         next();
     } catch (error) {
         console.log(error);
@@ -121,7 +117,6 @@ export async function validateMoveGame(req: Request, res: Response, next: NextFu
  * @param next 
  * @returns 
  */
-
 export async function checkMoveTime(req: Request, res: Response, next: NextFunction) {
     try {
         const currentTime = new Date();
@@ -155,7 +150,6 @@ export async function checkMoveTime(req: Request, res: Response, next: NextFunct
  * @param next 
  * @returns 
  */
-
 export async function checkGameExists(req: Request, res: Response, next: NextFunction) {
     try {
         const { gameId } = req.params;
@@ -187,7 +181,6 @@ export async function checkGameExists(req: Request, res: Response, next: NextFun
  * @param next 
  * @returns 
  */
-
 export async function checkUserInGame(req: any, res: any, next: any) {
     try {
         const creatorUser = req.body.userObj;
@@ -221,7 +214,6 @@ export async function checkUserInGame(req: any, res: any, next: any) {
  * @param next 
  * @returns 
  */
-
 export async function checkGameParticipation(req: Request, res: Response, next: NextFunction) {
     try {
         const { game, user } = req.body;
@@ -245,7 +237,6 @@ export async function checkGameParticipation(req: Request, res: Response, next: 
  * @param next 
  * @returns 
  */
-
 export async function checkUserCredits(req: Request, res: Response, next: NextFunction) {
     try {
         const user = req.body.user.email;
@@ -280,7 +271,6 @@ export async function checkUserCredits(req: Request, res: Response, next: NextFu
  * @param next 
  * @returns 
  */
-
 export async function isGameFinished(req: Request, res: Response, next: NextFunction) {
     try {
         const game = req.body.game;
@@ -305,7 +295,6 @@ export async function isGameFinished(req: Request, res: Response, next: NextFunc
  * @param next 
  * @returns 
  */
-
 export async function isYourTurn(req: Request, res: Response, next: NextFunction) {
     try {
         const game = req.body.game;

@@ -47,7 +47,7 @@ export async function giveCredits(req: Request, res: Response): Promise<void> {
         });
         res.header('content-type', 'application/json');
         const success = new RechargeSuccess().getResponse();
-        res.status(success.status).json({ message: success.message });
+        res.status(success.status).json({ Message: success.message });
     } catch (error) {
         console.error(error);
     }
@@ -68,7 +68,7 @@ export async function getCredits(req: Request, res: Response): Promise<void> {
         if (credits !== null) {
             res.status(200).json({ credits: credits });
         } else {
-            res.status(404).json({ message: "User not found or database error" });
+            res.status(404).json({ Message: "User not found or database error" });
         }
     } catch (error) {
         console.error(error);
