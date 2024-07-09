@@ -13,9 +13,16 @@ module.exports = {
       {
         email: 'user2@example.com',
         role: 'user',
-        credits: 5.00,
+        credits: 10.00,
+        inGame: true
+      },
+      {
+        email: 'zero@example.com',
+        role: 'user',
+        credits: 0.00,
         inGame: false
       }
+
     ], {});
   },
 

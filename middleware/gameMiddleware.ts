@@ -152,7 +152,7 @@ export async function checkMoveTime(req: Request, res: Response, next: NextFunct
  */
 export async function checkGameExists(req: Request, res: Response, next: NextFunction) {
     try {
-        const { gameId } = req.params;
+        const gameId: number = Number(req.params.gameId);
         if (!gameId || typeof gameId !== 'number' || gameId <= 0) {
             const errorMessage = new GameIdBadRequest().getResponse();
             return res.status(errorMessage.status).json({ error: errorMessage.message });

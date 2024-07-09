@@ -3,10 +3,10 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert('moves', [
-      {//tic-tac-toe
+      {
         gameId: 1,
         player: 'user1@example.com',
-        move: [1, null],
+        move: [1],
         gameType: 'AI',
         moveDate: new Date(),
         createdAt: new Date(),
@@ -15,17 +15,17 @@ module.exports = {
       {
         gameId: 1,
         player: 'user1@example.com',
-        move: [2, null],
+        move: [2],
         gameType: 'AI',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
       },
-      {//tic-tac-toe-3d
+      {
         gameId: 2,
         player: 'user1@example.com',
-        move: [2, 2], 
-        gameType: '3D',
+        move: [4],
+        gameType: '2D',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
@@ -33,8 +33,8 @@ module.exports = {
       {
         gameId: 2,
         player: 'user2@example.com',
-        move: [4, 2],
-        gameType: '3D',
+        move: [5],
+        gameType: '2D',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
@@ -42,8 +42,8 @@ module.exports = {
       {
         gameId: 2,
         player: 'user1@example.com',
-        move: [2, 3],
-        gameType: '3D',
+        move: [6],
+        gameType: '2D',
         moveDate: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
