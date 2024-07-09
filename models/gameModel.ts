@@ -6,6 +6,11 @@ import {CreateGameError} from "../messages/errorMessages";
 //Connection to DataBase
 const sequelize: Sequelize = DBAccess.getInstance()
 
+/**
+ * model 'GameTTT'
+ *
+ * Define the model 'GameTTT' to interface with the "games" table
+ */
 export const GameTTT = sequelize.define('games', {
         gameId: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
         player1: {type: DataTypes.STRING, allowNull: false, references: {

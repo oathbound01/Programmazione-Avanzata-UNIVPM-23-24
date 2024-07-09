@@ -20,6 +20,11 @@ export const User = sequelize.define('users', {
     timestamps: false,
 });
 
+/**
+ * Function to get the user's credits
+ * @param userEmail 
+ * @returns 
+ */
 export async function getUserCredits(userEmail: string) {
     try {
         const user = await User.findByPk(userEmail);

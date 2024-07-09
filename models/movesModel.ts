@@ -6,6 +6,11 @@ import {User} from "./userModel";
 //Connection to DataBase
 const sequelize: Sequelize = DBAccess.getInstance()
 
+/**
+ * model 'Moves'
+ *
+ * Define the model 'Moves' to interface with the "moves" table
+ */
 export const Moves = sequelize.define('moves', {
         moveId: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
         gameId: {type: DataTypes.INTEGER, allowNull: false, references: {
