@@ -67,8 +67,8 @@ The oute **<mark>/game/:gameId</mark>** is used to obtain detailed information a
 
 ![Diagramma dei casi d'uso - GameStatus](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/4f720390-cbf7-400f-a050-3ab03f8a7a2d)
 
-### Route: /move/:gameId
-The route **<mark>/move/:gameId</mark>** is used to make a move in a given game. When a player sends a request to make a move, the system first checks whether it is the turn of the player who sent the request. If it is not his turn, the move is rejected and the player is notified that he must wait for his turn.
+### Route: /move/:gameId:
+The route **<mark>/move/:gameId:</mark>** is used to make a move in a given game. When a player sends a request to make a move, the system first checks whether it is the turn of the player who sent the request. If it is not his turn, the move is rejected and the player is notified that he must wait for his turn.
 
 Next, the system checks whether the proposed move is valid according to the rules of the game. For example, in a game of tic-tac-toe, this means checking that the chosen square is vacant and not occupied by another mark. If the move is eligible, it is recorded in the system and the turn passes to the other player. In addition, the system updates the status of the game and checks whether the move resulted in a victory for one of the players, or whether the game ended in a draw.
 
@@ -77,15 +77,15 @@ In case the move is not valid, the system rejects the request and provides an ex
 ![Diagramma dei casi d'uso - MakeMove](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/ec02ce81-6f1c-4a09-add3-fdc7bb189744)
 
 ### Route: /history 
-The route **<mark>/history </mark>** is used to obtain the move history and allows users to view all the moves made in past games, providing options to customize the output format and search criteria.
+The route **<mark>/history</mark>** is used to obtain the move history and allows users to view all the moves made in past games, providing options to customize the output format and search criteria.
 
 When a user invokes this route, they can specify the desired output format, which can be PDF or JSON.
 In addition, the user can filter the moves according to the desired time period. A lower and upper date can be specified to define a time range.
 
 ![Diagramma dei casi d'uso - MoveHistory](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/28b5c69e-6a10-4d46-9e12-65b739b88622)
 
-### Route: /quit/:gameId 
-The **<mark>/quit/:gameId </mark>** route is for quitting a game currently in progress. When a player decides to abandon a game, they send a request to this specific route.
+### Route: /quit/:gameId:
+The **<mark>/quit/:gameId: </mark>** route is for quitting a game currently in progress. When a player decides to abandon a game, they send a request to this specific route.
 
 The system first verifies the identity of the player to ensure that the request actually comes from one of the participants of the game. Once the identity is confirmed, the system acknoledges the action and updates the status of the game, indicating that it has been forfeited. The remaining player is then declared as the winner.
 
@@ -361,9 +361,11 @@ When the user inputs an invalid route, they the following error message.
   
 ## 	👥 Contributors
 [Alessandro Rossini](https://github.com/oathbound01) (1119002)
+
 Contributed to controllers (game logic), error messages, miscellanous and game validation middleware. 
 
 [Tosca Pierro](https://github.com/toscap2002) (1120542)
+
 Contributed to models, migrations, seeders, success messages and authentication validation middleware.
 
 
