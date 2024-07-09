@@ -178,21 +178,21 @@ docker-compose up
 Once everything is set up and running, you can proceed to make requests using [Postman](https://www.postman.com/).
 
 ## 💻 Test
-In all routes that require authorization, the payload should include:
+In all routes that require authorization, the JWT payload should include the following fields:
 ```
 {
   "email": "user2@example.com",
-  "role": "admin",
-  "iat": 1516239022
+  "role": "user",
 }
 ```
-After that we can pass to test all the routes.
+After that we can go on to test all the routes.
+Each request made to a route should include a JSON-formatted payload in its body.
 
 ### **<mark>/newGame</mark>**
-In this route, we pass in the body:
-- 'gameOpponent': the player opponent;
-- 'gameMode': the type of the game that can be '2D' or '3D';
-- 'turnTime': is the timer of the turn.
+This route creates a new game. 
+- `gameOpponent`: the player opponent. Can be either a player's email or `AI`;
+- `gameMode`: the game type. Can be `2D` or `3D`;
+- `turnTime`: the turn timer in seconds. Maximum value is 300. Set to 0 for no timer;
 ```
 {
     "gameOpponent": "AI",
@@ -200,21 +200,22 @@ In this route, we pass in the body:
     "turnTime": 0
 }
 ```
+A successful response returns the ID of the newly-created game.
 
-The result of the this rout is the message that can be an error if there is an error or a success message if there isn't an error and the 'gameId' that is created.
-
-### **<mark>/game/:gameId</mark>**
+### **<mark>/game/<gameId></mark>**
 In this route, we pass the 'gameId' parameter in the URL.
 
 ### **<mark>/move/:gameId</mark>**
-In this route, the 'gameId' is passed in the URL and the move to be made is passed in the body.
+This is the route used to make a move in the Tic-Tac-Toe game board of game with id `gameId`.
+It will ad an 'X' if the user is player one or an 'O' if it's player two.
+- `move`: the coordinates of the board space where to place the next move. 0-8 for 2D games, [0-3, 0,15] for 3D games;
 ```
 {
     "move": "0",
 }
 
 ```
-The result is the 'gameState' that show how is going the game.
+The response contains the current game state.
 
 ```
 {
@@ -236,9 +237,10 @@ The result is the 'gameState' that show how is going the game.
 ```
 
 ### **<mark>/history</mark>**
-In this route, we pass in the body:
-- 'lowerDate': that rappresent the lower date of the move,
-- 'upperDate': that rappresent the upper date of the move.
+Return the move history for the current user. Can include optional filters in the request body.
+- `lowerDate`: retrieves all moves after this date. Format is `YYYY-MM-DD`;
+- `upperDate`: retrieves all moves after this date. Format is `YYYY-MM-DD`;
+- `fileType`: desired output format. Can be `PDF`,`pdf`,`JSON`,`json. Defaults to JSON.
 
 ```
 {
@@ -248,8 +250,10 @@ In this route, we pass in the body:
 ```
 
        
- ### **<mark>/quit/:gameId</mark>**
-In this route, we pass the 'gameId' in the URL to abandon the game and the result is a message that can be a success message, like the exemple or an error message.
+ ### **<mark>/quit/<gameId></mark>**
+Quits the game specified in `gameId`.
+Can't quit games that the user is not part of or that are already over.
+Awards a victory by forfeit to the other player.
 
 ```
 {
@@ -268,8 +272,8 @@ In this route, we pass the 'gameId' in the URL to abandon the game and the resul
 The file type can be 'csv' (like in the exemple) or pdf, or JSON.
  
  ### **<mark>/credits</mark>**
- In the route we have the user in the playload and it respond with the credits of the user.
- 
+Returns the current user's credits.
+
  ```
 {
     "credits": 4.3
@@ -277,9 +281,10 @@ The file type can be 'csv' (like in the exemple) or pdf, or JSON.
 ```
 
  ### **<mark>/recharge</mark>**
- In the rout, just if in the playlod the user has the role 'admin' can recharge the credits of the user, in the body we pass:
- - 'amount': that is the amount of the credit that the admin want give to the user,
- - 'recipient': the email of the user that that receive the recharge of the credits.
+This route allows an admin to recharge a specificied user's credit count. 
+It will fail if trying to recharge a user over the maximum balance of 25 credits.
+ - `amount`: the amount of credits to add;
+ - `recipient`: the email of the user that that will receive the credits.
 
 ```
 {
@@ -287,7 +292,7 @@ The file type can be 'csv' (like in the exemple) or pdf, or JSON.
     "recipient": "user1@example.com"
 }
 ```
-The result is a message, that can be an error message if there is an error in the recharge or a success message like in the exemple:
+Returns a message if it succeeds.
 
 ```
 {
@@ -298,7 +303,7 @@ The result is a message, that can be an error message if there is an error in th
 
 
 ### **<mark>/invalid</mark>**
-When in the URL we have ad 'invalid' name, it return an erre:
+When the user inputs an invalid route, they the following error message.
 ```
 {
     "error": "Route not found"
