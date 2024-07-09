@@ -7,6 +7,7 @@ import {
     InvalidFileTypeHistory,
     InvalidFileTypeLeaderboad,
     InvalidFilter,
+    MissingTokenParams,
     TooManyCreditsError,
     UserNotFound
 } from "../messages/errorMessages";
@@ -140,6 +141,10 @@ export async function checkRecharge(req: Request, res: Response, next: NextFunct
         if (amount <= 0 || isNaN(amount)) {
             const errorMessage = new ChargeCreditsError().getResponse();
             return res.status(errorMessage.status).json({ error: errorMessage.message });
+        }
+        if (typeof recipient !== 'string') {
+            const error = new UserNotFound().getResponse();
+            return res.status(error.status).json({ error: error.message });
         }
         await User.findByPk(recipient).then((user: any) => {
             if (!user) {
