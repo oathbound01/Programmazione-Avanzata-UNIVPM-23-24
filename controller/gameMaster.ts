@@ -233,14 +233,14 @@ export async function quitGame(req: Request, res: Response, timeOut?: boolean): 
     try {
         await GameTTT.findOne({
             attributes: ['player1', 'player2', 'status', 'currentTurn'],
-            where: { gameId: req.body.gameId }
+            where: { gameId: req.params.gameId }
         }).then((game: any) => {
             var newStatus = 'FORFEIT';
             var newWinner = req.body.user.email == game.player1 ? game.player2 : game.player1;
             GameTTT.update({
                 status: newStatus,
                 winner: newWinner
-            }, { where: { gameId: req.body.gameId } }).then(() => {
+            }, { where: { gameId: req.params.gameId } }).then(() => {
                 
                 // Updates the inGame status of the players
                 updatePlayerInGameStatus(game.player1, false);
