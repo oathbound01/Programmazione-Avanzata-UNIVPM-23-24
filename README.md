@@ -177,7 +177,12 @@ docker-compose up
 ```
 Once everything is set up and running, you can proceed to make requests using [Postman](https://www.postman.com/).
 
-## 💻 Tests
+## 💻 Demo
+bla bla bla
+![image](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/e4459575-83b7-44a4-9642-5276734e001d)
+
+bla bla bla
+![image (1)](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/d68bfe38-3190-417b-9358-fa071a21cfd0)
 
 
 ## 	👥 Contributors
