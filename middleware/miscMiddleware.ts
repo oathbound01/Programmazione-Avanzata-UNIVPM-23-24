@@ -1,4 +1,4 @@
-import e, { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { User, getUserCredits } from "../models/userModel";
 import {
     ChargeCreditsError,
@@ -29,8 +29,7 @@ export async function checkHistoryFileType(req: Request, res: Response, next: Ne
         if (fileType !== undefined && fileType !== 'json' && fileType !== 'PDF'
             && fileType !== 'JSON' && fileType !== 'pdf') {
             const errorMessage = new InvalidFileTypeHistory().getResponse();
-            res.header('content-type', 'application/json');
-            return res.status(errorMessage.status).send({ error: errorMessage.message });
+            return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         next();
     } catch (error) {
@@ -52,22 +51,18 @@ export async function checkHistoryFileType(req: Request, res: Response, next: Ne
 export async function checkValidDates(req: Request, res: Response, next: NextFunction) {
     try {
         const { lowerDate, upperDate } = req.body;
-
         if (lowerDate !== undefined) {
             const lDate: Date = new Date(lowerDate);
             if (isNaN(lDate.getTime())) {
                 const errorMessage = new InvalidDateFormat().getResponse();
-                res.header('content-type', 'application/json');
-                return res.status(errorMessage.status).send({ error: errorMessage.message });
+                return res.status(errorMessage.status).json({ error: errorMessage.message });
             }
         }
-
         if (upperDate !== undefined) {
             const uDate: Date = new Date(upperDate);
             if (isNaN(uDate.getTime())) {
                 const errorMessage = new InvalidDateFormat().getResponse();
-                res.header('content-type', 'application/json');
-                return res.status(errorMessage.status).send({ error: errorMessage.message });
+                return res.status(errorMessage.status).json({ error: errorMessage.message });
             }
         }
         next();
@@ -96,8 +91,7 @@ export function checkLeaderboardFileType(req: Request, res: Response, next: Next
             && fileType !== 'JSON' && fileType !== 'pdf'
             && fileType !== 'csv' && fileType !== 'CSV') {
             const errorMessage = new InvalidFileTypeLeaderboad().getResponse();
-            res.header('content-type', 'application/json');
-            return res.status(errorMessage.status).send({ error: errorMessage.message });
+            return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         next();
     } catch (error) {
@@ -122,8 +116,7 @@ export function checkLeaderboardFilters(req: Request, res: Response, next: NextF
         if (filter !== undefined) {
             if (filter !== 'ascending' && filter !== 'descending') {
                 const errorMessage = new InvalidFilter().getResponse();
-                res.header('content-type', 'application/json');
-                return res.status(errorMessage.status).send({ error: errorMessage.message });
+                return res.status(errorMessage.status).json({ error: errorMessage.message });
             }
         }
         next();
@@ -141,29 +134,24 @@ export async function checkRecharge(req: Request, res: Response, next: NextFunct
         const recipient: string = req.body.recipient;
         if (amount <= 0 || isNaN(amount)) {
             const errorMessage = new ChargeCreditsError().getResponse();
-            res.header('content-type', 'application/json');
-            return res.status(errorMessage.status).send({ error: errorMessage.message });
+            return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         await User.findByPk(recipient).then((user: any) => {
             if (!user) {
                 const errorMessage = new UserNotFound().getResponse();
-                res.header('content-type', 'application/json');
-                return res.status(errorMessage.status).send({ error: errorMessage.message });
+                return res.status(errorMessage.status).json({ error: errorMessage.message });
             }
             // Working with Sequelize has made me hate loosely-typed languages even more
             let oldCredits = Number(user.credits);
             if ((oldCredits + amount) > MAX_CREDITS) {
                 const errorMessage = new TooManyCreditsError().getResponse();
-                res.header('content-type', 'application/json');
-                return res.status(errorMessage.status).send({ error: errorMessage.message });
+                return res.status(errorMessage.status).json({ error: errorMessage.message });
             }
             next();
         });
-
     }
     catch (error) {
         console.error(error);
-        res.header('content-type', 'application/json');
         return res.status(500).json("Internal Server Error");
     }
 }
@@ -183,7 +171,7 @@ export async function checkCreditsExists(req: Request, res: Response, next: Next
         if (!getUserCredits(user)) {
             res.header('content-type', 'application/json')
             const error = new GetCreditsError().getResponse();
-            return res.status(error.status).send({ error: error.message });
+            return res.status(error.status).json({ error: error.message });
         } else {
             next();
         }

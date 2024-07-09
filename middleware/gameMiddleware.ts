@@ -6,7 +6,6 @@ import {
     InGame,
     TimeOut,
     CreditsError,
-    UserNotFound,
     MoveError,
     NoContent,
     GameModeError,
@@ -38,24 +37,19 @@ export async function validateGameCreation(req: Request, res: Response, next: Ne
         const playerOne = req.body.user.email;
         if (!gameMode || !gameOpponent || turnTime === undefined) {
             const errorMessage = new NoContent().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         else if (gameMode !== '2D' && gameMode !== '3D') {
             const errorMessage = new GameModeError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         } else if (typeof turnTime !== 'number' || turnTime <= 0 && turnTime > 300) {
             const errorMessage = new TimeBadRequest().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         } else if (playerOne === gameOpponent) {
             const errorMessage = new SamePlayerError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         } else if (gameMode === '3D' && gameOpponent === 'AI') {
             const errorMessage = new AI3DError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         next();
@@ -82,17 +76,14 @@ export async function validateMoveGame(req: Request, res: Response, next: NextFu
 
         if (move === undefined || move < 0) {
             const errorMessage = new MoveError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         if (gameMode === '2D' && typeof move !== 'number') {
             const errorMessage = new MoveError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         if (gameMode === '3D' && (!Array.isArray(move) || typeof move[0] !== 'number' || typeof move[1] !== 'number')) {
             const errorMessage = new Move3DError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
 
@@ -100,21 +91,17 @@ export async function validateMoveGame(req: Request, res: Response, next: NextFu
 
         if (gameMode === '2D' && (move < 0 || move > 8)) {
             const errorMessage = new OutOfBounds().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         } else if (gameMode === '3D' && (move[0] < 0 || move[0] > 3 || move[1] < 0 || move[1] > 15)) {
             const errorMessage = new OutOfBounds().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
 
         // Check if the move is already taken
 
         if (gameMode === '2D' && game.getDataValue('gameState')[move] !== '') {
-            res.header('Content-Type', 'application/json');
             return res.status(400).json({ error: 'That space is already taken' });
         } else if (gameMode === '3D' && game.getDataValue('gameState')[move[0]][move[1]] !== '') {
-            res.header('Content-Type', 'application/json');
             return res.status(400).json({ error: 'That space is already taken' });
         }
 
@@ -148,7 +135,6 @@ export async function checkMoveTime(req: Request, res: Response, next: NextFunct
         if (move > timeLimit) {
             quitGame(req, res, true);
             const errorMessage = new TimeOut().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         next();
@@ -172,16 +158,14 @@ export async function checkMoveTime(req: Request, res: Response, next: NextFunct
 
 export async function checkGameExists(req: Request, res: Response, next: NextFunction) {
     try {
-        const { gameId } = req.body;
+        const { gameId } = req.params;
         if (!gameId || typeof gameId !== 'number' || gameId <= 0) {
             const errorMessage = new GameIdBadRequest().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         let game = await GameTTT.findByPk(gameId);
         if (!game) {
             const errorMessage = new GameIdNotFound().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         req.body.game = game;
@@ -206,40 +190,21 @@ export async function checkGameExists(req: Request, res: Response, next: NextFun
 
 export async function checkUserInGame(req: any, res: any, next: any) {
     try {
-        const player1 = req.body.user.email;
-        const player2 = req.body.gameOpponent;
-        const creatorUser = await User.findOne({
-            where: { email: player1 }
-        });
-        if (!creatorUser) {
-            const errorMessage = new UserNotFound().getResponse();
-            res.header('Content-Type', 'application/json');
-            return res.status(errorMessage.status).json({ error: errorMessage.message, user: player1 });
-        }
+        const creatorUser = req.body.userObj;
+        const opponentUser = req.body.opponentObj;
         if (creatorUser.getDataValue('inGame')) {
             const errorMessage = new InGame().getResponse();
-            res.header('Content-Type', 'application/json');
-            return res.status(errorMessage.status).json({ error: errorMessage.message, user: player1 });
+            return res.status(errorMessage.status).json({ error: errorMessage.message, user: creatorUser.email });
         }
         // Check for AI opponent early return if opponentType is 'ai'
-        if (player2 === 'AI') {
+        if (req.body.gameOpponent === 'AI') {
             // No need to check for AI's availability as it's always available
             return next();
         }
-        const opponentUser = await User.findOne({
-            where: { email: player2 }
-        });
-        if (!opponentUser) {
-            const errorMessage = new UserNotFound().getResponse();
-            res.header('Content-Type', 'application/json');
-            return res.status(errorMessage.status).json({ error: errorMessage.message, opponent: player2 });
-        }
         if (opponentUser.getDataValue('inGame')) {
             const errorMessage = new InGame().getResponse();
-            res.header('Content-Type', 'application/json');
-            return res.status(errorMessage.status).json({ error: errorMessage.message, opponent: player2 });
+            return res.status(errorMessage.status).json({ error: errorMessage.message, opponent: opponentUser.email });
         }
-
         next();
     } catch (error) {
         console.log(error);
@@ -262,7 +227,6 @@ export async function checkGameParticipation(req: Request, res: Response, next: 
         const { game, user } = req.body;
         if (game.getDataValue('player1') !== user.email && game.getDataValue('player2') !== user.email) {
             const errorMessage = new NotPartOfGameError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         next();
@@ -288,19 +252,16 @@ export async function checkUserCredits(req: Request, res: Response, next: NextFu
         let credits = await getUserCredits(user);
         if (!credits) {
             const errorMessage = new CreditsError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         let opponent = req.body.gameOpponent;
         // Check if the user has enough credits to perform the operation
         if (opponent == 'AI' && credits < 0.75) {
             const errorMessage = new CreditsError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         if (opponent != 'AI' && credits < 0.45) {
             const errorMessage = new CreditsError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         next();
@@ -326,7 +287,6 @@ export async function isGameFinished(req: Request, res: Response, next: NextFunc
         if (game.getDataValue('status') === 'FINISHED' || game.getDataValue('status') === 'DRAW'
             || game.getDataValue('status') === 'FORFEIT') {
             const errorMessage = new GameFinishedError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         next();
@@ -352,7 +312,6 @@ export async function isYourTurn(req: Request, res: Response, next: NextFunction
         const userId = req.body.user.email;
         if (game.getDataValue('currentTurn') !== userId) {
             const errorMessage = new NotYourTurnError().getResponse();
-            res.header('Content-Type', 'application/json');
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         }
         next();

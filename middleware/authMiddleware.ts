@@ -1,4 +1,4 @@
-import e, { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from "../models/userModel";
 import {
@@ -10,12 +10,18 @@ import {
 } from "../messages/errorMessages";
 
 /**
+ * 
  * This function verifies the JWT token from the request header.
  * It decodes the token using a secret key and the RS256 algorithm. 
  * If the token is valid, it attaches the decoded token to the request body 
  * and calls the next middleware. If the token is missing or invalid,
  * it logs the error and calls the next middleware with the error.
-**/
+ * 
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
 export const verifyAndAuthenticate = (req: Request, res: Response, next: NextFunction) => {
     try {
         const { authorization } = req.headers;
@@ -51,26 +57,41 @@ export const verifyAndAuthenticate = (req: Request, res: Response, next: NextFun
 };
 
 /**
- * This function checks if the user role in the request body is 'admin'.
-**/
+ * 
+ * This function checks if the user is an admin, both in the request body and in the database.
+ * 
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
 export function checkAdmin(req: any, res: any, next: any): void {
     try {
-        if (req.body.user.role === 'admin') {
+        const user = req.body.user;
+        User.findByPk(user.email).then((result: any) => {
+        if (req.body.user.role === 'admin' && result.role === 'admin') {
             next();
         } else {
             res.header('content-type', 'application/json')
             const error = new UnauthorizedUser().getResponse();
             return res.status(error.status).json({ error: error.message });
         }
+    });
     } catch (error) {
         console.error(error);
         return res.status(500).send('Internal Server Error');
     }
 }
 /**
+ * 
  * This function checks if the user exists in the database.
  * If the user is not found, it returns an error message.
-**/
+ * 
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
 export function checkUserExists(req: any, res: any, next: any): void {
     try {
         const user = req.body.user;
@@ -80,6 +101,7 @@ export function checkUserExists(req: any, res: any, next: any): void {
                 const error = new UserNotFound().getResponse();
                 return res.status(error.status).json({ error: error.message });
             }
+            req.body.userObj = result;
             next();
         });
     } catch (error) {
@@ -109,6 +131,7 @@ export function checkOpponentExists(req: any, res: any, next: any): void {
                 const error = new UserNotFound().getResponse();
                 return res.status(error.status).json({ error: error.message, opponent: opponent });
             }
+            req.body.opponentObj = result;
             next();
         });
     } catch (error) {
