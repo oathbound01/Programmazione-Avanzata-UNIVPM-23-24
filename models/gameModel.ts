@@ -20,7 +20,7 @@ export const GameTTT = sequelize.define('games', {
         player2: {type: DataTypes.STRING,
         },
         startTime: {type: DataTypes.DATE, allowNull: false},
-        turnTime: {type: DataTypes.DATE, allowNull: false},
+        turnTime: {type: DataTypes.INTEGER, allowNull: false},
         currentTurn: {type: DataTypes.STRING, allowNull: false},
         gameMode: {type: DataTypes.STRING, allowNull: false},
         status: {type: DataTypes.STRING, allowNull: false},

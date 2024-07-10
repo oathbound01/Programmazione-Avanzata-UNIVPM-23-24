@@ -11,4 +11,4 @@ RUN npm install -g typescript ts-node nodemon sequelize-cli
 
 RUN tsc
 #CMD ["nodemon", "app.ts"]
-CMD ["ts-node", "app.ts"]
+CMD ["ts-node", "--transpile-only", "app.ts"]

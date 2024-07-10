@@ -42,7 +42,7 @@ export async function validateGameCreation(req: Request, res: Response, next: Ne
         else if (gameMode !== '2D' && gameMode !== '3D') {
             const errorMessage = new GameModeError().getResponse();
             return res.status(errorMessage.status).json({ error: errorMessage.message });
-        } else if (typeof turnTime !== 'number' || turnTime <= 0 && turnTime > 300) {
+        } else if (typeof turnTime !== 'number' || turnTime < 0 || turnTime > 300) {
             const errorMessage = new TimeBadRequest().getResponse();
             return res.status(errorMessage.status).json({ error: errorMessage.message });
         } else if (playerOne === gameOpponent) {

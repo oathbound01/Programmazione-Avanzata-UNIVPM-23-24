@@ -35,7 +35,7 @@ module.exports = {
         allowNull: false
       },
       turnTime: {
-        type: Sequelize.DATE,
+        type: Sequelize.INTEGER,
         allowNull: false
       },
       currentTurn: {
