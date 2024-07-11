@@ -124,7 +124,7 @@ Once the authenticity of the request is confirmed, the system proceeds to update
 | /history       | GET    | Get all moves by the user         |        Yes         |
 | /quit/:gameId: | POST   | Quit a game                       |        Yes         |
 | /leaderboard   | GET    | Get the leaderboard               |        No          |
-| /credits       | Get    | Get user credits                  |        Yes         | 
+| /credits       | GET    | Get user credits                  |        Yes         | 
 | /recharge      | POST   | Recharge a user's credits         |        Yes         | 
 
 
