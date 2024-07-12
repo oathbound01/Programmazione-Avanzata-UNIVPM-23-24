@@ -1,0 +1,16 @@
+# This is the development Dockerfile. Use only to test the app in a dev environment
+FROM node:lts-slim
+WORKDIR /usr/app
+COPY . .
+
+ENV NODE_ENV=development
+
+# Dependencies
+
+RUN npm install --include=dev
+RUN npm install -g typescript ts-node nodemon sequelize-cli
+
+# App run
+
+RUN tsc
+CMD ["nodemon", "app.ts"]
