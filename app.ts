@@ -1,5 +1,7 @@
 import express, {Application, Request, Response} from 'express';
 import * as gameMaster from './controller/gameMaster';
+import * as leaderboard from './controller/leaderboard';
+import * as moveHistory from './controller/moveHistory';
 import * as cor from './middleware/pipeline';
 import * as credManagement from './controller/creditManagement';
 
@@ -23,7 +25,7 @@ app.post('/move/:gameId',cor.gameMove, (req: Request, res: Response) => {
     });
 
 app.get('/history', cor.moveHistory, (req: Request, res: Response) => {
-    gameMaster.getMoveHistory(req, res)
+    moveHistory.getMoveHistory(req, res)
     });
 
 app.post('/quit/:gameId', cor.gameQuit, (req: Request, res: Response) => {
@@ -31,7 +33,7 @@ app.post('/quit/:gameId', cor.gameQuit, (req: Request, res: Response) => {
     });
 
 app.get('/leaderboard', cor.leaderboard, (req: Request, res: Response) => {
-    gameMaster.getLeaderboard(req, res)
+    leaderboard.getLeaderboard(req, res)
 });
 
 app.get('/credits', cor.checkCredits,(req: Request, res: Response) => {
