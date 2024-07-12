@@ -26,7 +26,6 @@ export const verifyAndAuthenticate = (req: Request, res: Response, next: NextFun
     try {
         const { authorization } = req.headers;
         if (!authorization) {
-            res.header('content-type', 'application/json')
             const error = new MissingAuthorization().getResponse();
             return res.status(error.status).json({ error: error.message });
         }
@@ -38,21 +37,18 @@ export const verifyAndAuthenticate = (req: Request, res: Response, next: NextFun
         const privateKey: string = process.env.PRIVATE_KEY!;
         const decoded = jwt.verify(token, privateKey, { algorithms: ['RS256'] });
         if (!decoded) {
-            res.header('content-type', 'application/json')
             const error = new GetTokenError().getResponse();
             return res.status(error.status).json({ error: error.message });
         }
         req.body.user = decoded; // Attach decoded token to a new property
         if (!req.body.user.role || (req.body.user.role !== 'admin' && req.body.user.role !== 'user'))  {
-            res.header('content-type', 'application/json')
             const error = new MissingTokenParams().getResponse();
             return res.status(error.status).json({ error: error.message });
         }
         next();
     } catch (error) {
         console.log(error);
-        res.header('content-type', 'application/json')
-        return res.status(400).send({ error: 'Bad Token'});
+        return res.status(400).json({ error: 'Bad Token'});
     }
 };
 
