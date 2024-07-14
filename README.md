@@ -30,7 +30,7 @@
 
 We implemented a system to manage the game of Tic Tac Toe. In particular, the system should accomodate two users (authenticated through JWT) or one user interacting against an AI opponent. There can be multiple active games at any given time. A user can only take part in one game at a time. 
 
-This system uses JWT, allowing only authenticated users to log in and interact with the platform. Users can create games by specifying the game mode, which can be between two users (either 2D or 3D Tic Tac Toe) or against an AI, and define a maximum time for each move, with the option of having no time limit. Credit management is a key aspect of the project: each user has a balance of 'credits' that is charged for creating games and for each move. These credits can be managed and recharged by a system administrator.
+This system uses JWT, allowing only authenticated users to log in and interact with the platform. Users can create games by specifying the game mode, which can be between two users (either 2D or 3D Tic Tac Toe) or against an AI, and define a maximum time for each move, with the option of having no time limit. Credit management is a key aspect of the project: each user has a balance of 'credits' that is charged for creating games and for each move. These credits can be managed and recharged by a system administrator. The 2D games consist of the classic 3x3 board, while the 3D games use a 4x4x4 board, forming a cube, allowing for users to score even three-dimensionally.
 
 The system offers comprehensive game management features, including checking moves and the ability to quit a game. Users can check the current status of games, verifying whose turn it is, whether the game has ended, and who is the winner. In addition, the system maintains a detailed history of moves.
 
@@ -53,30 +53,30 @@ The sostware has a leaderboard system that orders players by games won, includin
 ![Diagramma dei casi d'uso - Diagramma dei casi d'uso](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/47cec9b6-edf2-4a0f-806d-ee84192a2c38)
 
 ### Route: /newGame 
-The route **<mark>/newGame</mark>** is used to create a new gam. The user must provide some specific information about the game, such as the opponent or the game mode. The type of match can be chosen between user versus user, which can be in a simple version or a 3D version, or user versus AI. In the case of a user versus user match, it is necessary to specify the e-mail of the opponent.
+The route **<mark>/newGame</mark>** is used to create a new game. The user must provide some specific information about the game, such as the opponent or the game mode. The type of game can be chosen between user versus user, which can be in a simple version or a 3D version, or user versus AI. In the case of a user versus user game, it is necessary to specify the e-mail of the opponent.
 
-In addition, a maximum time to make a move can be set; if the time expires, the match is declared over. There is also an option to impose no time limit for moves.
+In addition, a maximum time to make a move can be set; if the time expires, the game is declared over. There is also an option to impose no time limit for moves.
 
-Each match incurs a cost in terms of tokens. For creating a user versus user match, a cost of 0.45 tokens is charged, while for a user versus AI match the cost is 0.75 tokens. In addition, each move made, whether by users or AI, has a cost of 0.05 tokens. You can create a match only if you have enough credits to cover the initial cost of creation. However, if the available credit drops below zero during the course of the match, you will still be able to play.
+Each game incurs a cost in terms of credits. For creating a user versus user game, a cost of 0.45 credits is charged, while for a user versus AI game the cost is 0.75 credits. In addition, each move made, whether by users or AI, has a cost of 0.05 credits. You can create a game only if you have enough credits to cover the initial cost of creation. However, if the available credits drop below zero during the course of the game, you will still be able to play.
 
 ![Diagramma dei casi d'uso - NewGame](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/690451fa-ab84-4ab5-8023-42ebc9d312c2)
 
 ### Route: /game/:gameId
-The oute **<mark>/game/:gameId</mark>** is used to obtain detailed information about a given game. When a user sends a request to this route, the current status of the game is returned, including whose turn it is currently, whether the game has ended, and, if so, who is the winner. The response also provides additional pertinent details, such as the current game state (the game board) and any relevant information that may affect the progress of the game.
+The route **<mark>/game/:gameId</mark>** is used to obtain detailed information about a given game. When a user sends a request to this route, the current status of the game is returned, including whose turn it is currently, whether the game has ended, and, if so, who is the winner. The response also provides additional pertinent details, such as the current game state (the game board) and any relevant information that may affect the progress of the game.
 
 ![Diagramma dei casi d'uso - GameStatus](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/4f720390-cbf7-400f-a050-3ab03f8a7a2d)
 
 ### Route: /move/:gameId:
 The route **<mark>/move/:gameId:</mark>** is used to make a move in a given game. When a player sends a request to make a move, the system first checks whether it is the turn of the player who sent the request. If it is not his turn, the move is rejected and the player is notified that he must wait for his turn.
 
-Next, the system checks whether the proposed move is valid according to the rules of the game. For example, in a game of tic-tac-toe, this means checking that the chosen square is vacant and not occupied by another mark. If the move is eligible, it is recorded in the system and the turn passes to the other player. In addition, the system updates the status of the game and checks whether the move resulted in a victory for one of the players, or whether the game ended in a draw.
+Next, the system checks whether the proposed move is valid according to the rules of the game. For example, in a game of Tic Tac Toe, this means checking that the chosen square is vacant and not occupied by another mark. If the move is eligible, it is recorded in the system and the turn passes to the other player. In addition, the system updates the status of the game and checks whether the move resulted in a victory for one of the players, or whether the game ended in a draw.
 
 In case the move is not valid, the system rejects the request and provides an explanatory message describing why the move is not acceptable.
 
 ![Diagramma dei casi d'uso - MakeMove](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/ec02ce81-6f1c-4a09-add3-fdc7bb189744)
 
 ### Route: /history 
-The route **<mark>/history</mark>** is used to obtain the move history and allows users to view all the moves made in past games, providing options to customize the output format and search criteria.
+The route **<mark>/history</mark>** is used to obtain the move history and allows users to view all the moves made by them in past games, providing options to customize the output format and search criteria.
 
 When a user invokes this route, they can specify the desired output format, which can be PDF or JSON.
 In addition, the user can filter the moves according to the desired time period. A lower and upper date can be specified to define a time range.
@@ -86,16 +86,16 @@ In addition, the user can filter the moves according to the desired time period.
 ### Route: /quit/:gameId:
 The **<mark>/quit/:gameId: </mark>** route is for quitting a game currently in progress. When a player decides to abandon a game, they send a request to this specific route.
 
-The system first verifies the identity of the player to ensure that the request actually comes from one of the participants of the game. Once the identity is confirmed, the system acknoledges the action and updates the status of the game, indicating that it has been forfeited. The remaining player is then declared as the winner.
+The system first verifies the identity of the player to ensure that the request actually comes from one of the participants of the game. Once the identity is confirmed, the system acknowledges the action and updates the status of the game, indicating that it has been forfeited. The remaining player is then declared as the winner.
 
 ![Diagramma dei casi d'uso - QuitGame](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/2a0bf80f-93a6-4a32-917b-caed46017442)
 
 ### Route: /leaderboard
-To implement the **<mark>/leaderboard</mark>** route, which returns player rankings without requiring authentication, the system needs to collect and aggregate several pieces of information related to games played. The ranking includes the total number of games won, both regularly and by opponent abandonment, and the number of games lost, also divided into regular and opponent abandonment losses. This data is categorized according to whether the games were played against other users or against artificial intelligence (AI).
+The **<mark>/leaderboard</mark>** route returns player rankings without requiring authentication. The ranking includes the total number of games won, both regularly and by forfeit, and the number of games lost, also divided into regular and forfeited losses. This data also includes whether the games were played against other users or against artificial intelligence (AI).
 
-Each player's score is calculated by considering all games won, including those by opponent abandonment. This score is the main metric for ranking players.
+Each player's score is calculated by considering all games won, including those by opponent forfeit. This score is the main metric for ranking players.
 
-When a user accesses the ranking route, they can choose to sort the results in ascending or descending order with respect to the players' score. The output of the route is available in three formats-JSON, PDF, and CSV.
+When a user accesses the ranking route, they can choose to sort the results in ascending or descending order with respect to the players' score. The output of the route is available in three formats: JSON, PDF, and CSV.
 
 ![Diagramma dei casi d'uso - Leaderboard (1)](https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24/assets/95303629/44dbe94d-e84d-4d82-920e-83e8641a5ca2)
 
@@ -140,7 +140,7 @@ The DAO (Data Access Object) pattern is a design pattern that separates data acc
 In our project, the DAO pattern was used to manage data access and manipulation within the PostgreSQL database through the Sequelize ORM in the Node.js environment.
 
 ### Model-Controller
-In our project, the Model-Controller (or Model-View-Controller, MVC) pattern is used to organize the application structure and clearly separate responsibilities between data management (Model) and business logic (Controller). This approach promotes a modular and scalable backend application structure. In the backend context, a view (view) is not used; requests are made using Postman.
+In our project, the Model-Controller (or Model-View-Controller, MVC) pattern is used to organize the application structure and clearly separate responsibilities between data management (Model) and business logic (Controller). This approach promotes a modular and scalable backend application structure. In the backend context, a view is not used; requests are made using Postman.
 
 ### Chain of Responsibility
 The Chain of Responsibility is a behavioral design pattern that allows you to pass requests along a chain of handlers. Each handler in the chain has the ability to process the request or pass it on to the next handler in the chain. This pattern decouples the sender of a request from its receiver, giving multiple objects a chance to handle the request.
@@ -194,7 +194,7 @@ This will give you acces to three default users:
 - "user2@example.com": a standard user;
 - "zero@example.com": another standard user with 0 tokens left;
 
-Once everything is set up, you can proceed to make requests using [Postman](https://www.postman.com/).
+Once everything is set up, you can proceed to make requests using [Postman](https://www.postman.com/) or any other web tools such as [wget](https://www.gnu.org/software/wget/) or [cURL](https://curl.se/).
 
 ## 💻 Test
 In all routes that require authorization, the JWT payload should include the following fields:
@@ -221,7 +221,7 @@ This route creates a new game.
 ```
 A successful response returns the ID of the newly-created game.
 
-### **<mark>/game/<gameId></mark>**
+### **<mark>/game/:gameId:</mark>**
 In this route, we pass the `gameId` parameter in the URL. The result is:
 ```
 {
@@ -249,8 +249,8 @@ In this route, we pass the `gameId` parameter in the URL. The result is:
 
 ### **<mark>/move/:gameId:</mark>**
 This is the route used to make a move in the Tic-Tac-Toe game board of game with id `gameId`.
-It will ad an 'X' if the user is player one or an 'O' if it's player two.
-- `move`: the coordinates of the board space where to place the next move. 0-8 for 2D games, [0-3, 0,15] for 3D games;
+It will add an 'X' if the user is player one or an 'O' if it's player two.
+- `move`: the coordinates of the board space where to place the next move. 0-8 for 2D games, [0-3, 0-15] for 3D games (with the former number being the vertical board and the latter being the position on that board);
 ```
 {
     "move": "0",
@@ -279,7 +279,7 @@ The response contains the current game state.
 ```
 
 ### **<mark>/history</mark>**
-Return the move history for the current user. Can include optional filters in the request body.
+Returns the move history for the current user. Can include optional filters in the request body.
 - `lowerDate`: retrieves all moves after this date. Format is `YYYY-MM-DD`;
 - `upperDate`: retrieves all moves after this date. Format is `YYYY-MM-DD`;
 - `fileType`: desired output format. Can be `PDF`, `pdf`, `JSON`, `json`. Defaults to JSON.
@@ -333,8 +333,8 @@ Can include optional parameters in the body:
     "fileType": "csv"
 }
 ```
-`fileType`: desired output format. Can be `PDF`, `pdf`, `csv`, `json`, `JSON`, `json`. Defaults to JSON. 
-And the result is:
+`fileType`: desired output format. Can be `pdf`/`PDF`, `csv`/`CSV` `json`/`JSON`. Defaults to JSON. 
+Result example:
 ```
 User,Wins,Losses,Forfeit Wins,Forfeit Losses,Wins against AI,Losses against AI
 user1@example.com,1,1,0,0,1,0
@@ -371,7 +371,7 @@ Returns a message if it succeeds.
 ```
 
 ### **<mark>/invalid</mark>**
-When the user inputs an invalid route, they the following error message.
+When the user inputs an invalid route, they get the following error message.
 ```
 {
     "error": "Route not found"
