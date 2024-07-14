@@ -151,7 +151,7 @@ In our project, the Chain of Responsibility pattern is implemented using middlew
 To use the project, you need to have [Docker](https://www.docker.com/) installed and running on your device. 
 Secondly, you need to clone this GitHub repository:
 ```
-[git clone https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24
+git clone https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24
 ```
 
 After coping the project, you need to place a **<mark>.env</mark>** file inside the project directory. Here are the required fields with example parameters:
