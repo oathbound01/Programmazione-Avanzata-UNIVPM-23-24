@@ -154,7 +154,7 @@ Secondly, you need to clone this GitHub repository:
 git clone https://github.com/oathbound01/Programmazione-Avanzata-UNIVPM-23-24
 ```
 
-After coping the project, you need to place a **<mark>.env</mark>** file inside the project directory. Here are the required fields with example parameters:
+After cloning the project, you need to place a **<mark>.env</mark>** file inside the project directory. Here are the required fields with example parameters:
 ```
 DB_NAME=tictactoe
 DB_USER=tttadmin
